@@ -1,4 +1,4 @@
-# Dockerfile for Publisher Portal
+# Dockerfile for Advertiser Portal
 FROM node:20-alpine AS base
 
 # Dependencies

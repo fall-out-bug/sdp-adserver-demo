@@ -1,0 +1,94 @@
+services:
+  # PostgreSQL Database (internal only - no host port needed)
+  db:
+    image: postgres:15-alpine
+    container_name: adserver-db
+    environment:
+      - POSTGRES_DB=adserver
+      - POSTGRES_USER=adserver
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - adserver-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adserver"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (internal only - no host port needed)
+  redis:
+    image: redis:7-alpine
+    container_name: adserver-redis
+    networks:
+      - adserver-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (internal only - portals connect via docker network)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: adserver-backend
+    environment:
+      - SERVER_PORT=8080
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=adserver
+      - DB_PASSWORD=password
+      - DB_NAME=adserver
+      - REDIS_ADDR=redis:6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - adserver-network
+
+  # Publisher Portal
+  publisher-portal:
+    build:
+      context: ./publisher-portal
+      dockerfile: Dockerfile
+    container_name: adserver-publisher-portal
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_PORTAL_TYPE=publisher
+    depends_on:
+      - backend
+    networks:
+      - adserver-network
+
+  # Advertiser Portal
+  advertiser-portal:
+    build:
+      context: ./advertiser-portal
+      dockerfile: Dockerfile
+    container_name: adserver-advertiser-portal
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_PORTAL_TYPE=advertiser
+    depends_on:
+      - backend
+    networks:
+      - adserver-network
+
+volumes:
+  postgres_data:
+
+networks:
+  adserver-network:
+    driver: bridge

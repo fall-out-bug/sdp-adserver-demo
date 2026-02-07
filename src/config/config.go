@@ -43,8 +43,8 @@ type RedisConfig struct {
 func Load() (*Config, error) {
 	cfg := &Config{}
 
-	// Process with envconfig (will use ADSERVER_ prefix)
-	err := envconfig.Process("adserver", cfg)
+	// Process with envconfig (no prefix to allow direct env var names)
+	err := envconfig.Process("", cfg)
 	if err != nil {
 		return nil, err
 	}
