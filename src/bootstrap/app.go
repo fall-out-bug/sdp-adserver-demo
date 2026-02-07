@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/fall-out-bug/demo-adserver/src/application/auth"
 	"github.com/fall-out-bug/demo-adserver/src/application/delivery"
 	"github.com/fall-out-bug/demo-adserver/src/application/tracking"
 	"github.com/fall-out-bug/demo-adserver/src/config"
@@ -15,6 +16,7 @@ import (
 	"github.com/fall-out-bug/demo-adserver/src/presentation/http/middleware"
 	"github.com/fall-out-bug/demo-adserver/src/infrastructure/postgres"
 	"github.com/fall-out-bug/demo-adserver/src/infrastructure/redis"
+	securityinfra "github.com/fall-out-bug/demo-adserver/src/infrastructure/security"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -54,19 +56,29 @@ func New(cfg *config.Config) (*App, error) {
 	bannerRepo := postgres.NewBannerRepository(db)
 	impressionRepo := postgres.NewImpressionRepository(db)
 	clickRepo := postgres.NewClickRepository(db)
+	publisherRepo := postgres.NewPublisherRepository(db)
+	advertiserRepo := postgres.NewAdvertiserRepository(db)
 
 	// Initialize infrastructure
-	redisCache := redis.NewCache(redisClient.Client)
 	rateLimiter := redis.NewRateLimiter(redisClient.Client)
 	deduper := redis.NewDeduper(redisClient.Client)
 
 	// Create cache adapter
-	cacheAdapter := &cacheAdapter{cache: redisCache}
+	cacheAdapter := &cacheAdapter{cache: redis.NewCache(redisClient.Client)}
+
+	// Initialize security
+	passwordHasher := securityinfra.NewBcryptPasswordHasher(12)
+	jwtService := securityinfra.NewJWTService(cfg.JWT.Secret, cfg.JWT.Expiration)
 
 	// Initialize services
 	deliveryService := delivery.NewService(campaignRepo, bannerRepo, cacheAdapter)
 	impressionService := tracking.NewImpressionService(impressionRepo, deduper)
 	clickService := tracking.NewClickService(impressionRepo, clickRepo, bannerRepo)
+	publisherService := auth.NewPublisherService(publisherRepo, passwordHasher, jwtService)
+	advertiserService := auth.NewAdvertiserService(advertiserRepo, passwordHasher, jwtService)
+
+	// Create JWT authenticator adapter
+	jwtAuthenticator := securityinfra.NewJWTAuthenticatorAdapter(jwtService)
 
 	// Setup HTTP server
 	gin.SetMode(gin.ReleaseMode)
@@ -84,8 +96,9 @@ func New(cfg *config.Config) (*App, error) {
 	rateLimitAdapter := &rateLimitAdapter{limiter: rateLimiter}
 	router.Use(middleware.NewRateLimitMiddleware(rateLimitAdapter).Handle())
 
-	// Setup routes
-	httpHandlers.SetupRoutes(router, deliveryService, impressionService, clickService)
+	// Setup routes with auth services
+	httpHandlers.SetupRoutes(router, deliveryService, impressionService, clickService,
+		publisherService, advertiserService, jwtAuthenticator)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Server.Port),
@@ -116,36 +129,6 @@ func (a *rateLimitAdapter) CheckRateLimit(ctx interface{}, ip string) (bool, err
 
 func (a *rateLimitAdapter) GetRetryAfter(ctx interface{}, ip string) (int, error) {
 	return a.limiter.GetRetryAfter(ctx.(context.Context), ip)
-}
-
-// Run starts the HTTP server
-func (a *App) Run() error {
-	a.logger.Info("Starting server",
-		zap.String("addr", a.server.Addr),
-		zap.Int("port", a.config.Server.Port),
-	)
-
-	// Start server in goroutine
-	go func() {
-		if err := a.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			a.logger.Error("Server error", zap.Error(err))
-		}
-	}()
-
-	// Wait for shutdown signal
-	<-a.shutdownCh
-
-	// Graceful shutdown
-	a.logger.Info("Shutting down server...")
-	ctx, cancel := context.WithTimeout(context.Background(), a.config.Server.ShutdownTimeout)
-	defer cancel()
-
-	if err := a.server.Shutdown(ctx); err != nil {
-		return fmt.Errorf("server shutdown failed: %w", err)
-	}
-
-	a.logger.Info("Server stopped")
-	return nil
 }
 
 // cacheAdapter adapts redis.Cache to delivery.Cache interface
@@ -180,6 +163,36 @@ func (a *cacheAdapter) SetBanner(ctx context.Context, slotID string, banner *del
 		Impression: banner.Impression,
 		CampaignID: banner.CampaignID,
 	})
+}
+
+// Run starts the HTTP server
+func (a *App) Run() error {
+	a.logger.Info("Starting server",
+		zap.String("addr", a.server.Addr),
+		zap.Int("port", a.config.Server.Port),
+	)
+
+	// Start server in goroutine
+	go func() {
+		if err := a.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			a.logger.Error("Server error", zap.Error(err))
+		}
+	}()
+
+	// Wait for shutdown signal
+	<-a.shutdownCh
+
+	// Graceful shutdown
+	a.logger.Info("Shutting down server...")
+	ctx, cancel := context.WithTimeout(context.Background(), a.config.Server.ShutdownTimeout)
+	defer cancel()
+
+	if err := a.server.Shutdown(ctx); err != nil {
+		return fmt.Errorf("server shutdown failed: %w", err)
+	}
+
+	a.logger.Info("Server stopped")
+	return nil
 }
 
 // Shutdown gracefully shuts down the server

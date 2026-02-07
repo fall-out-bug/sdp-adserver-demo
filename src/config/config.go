@@ -12,6 +12,7 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	Redis    RedisConfig
+	JWT      JWTConfig
 }
 
 // ServerConfig holds HTTP server configuration
@@ -39,6 +40,12 @@ type RedisConfig struct {
 	DB       int    `envconfig:"REDIS_DB" default:"0"`
 }
 
+// JWTConfig holds JWT configuration
+type JWTConfig struct {
+	Secret     string        `envconfig:"JWT_SECRET" default:"secret-key-change-in-production"`
+	Expiration time.Duration `envconfig:"JWT_EXPIRATION" default:"24h"`
+}
+
 // Load loads configuration from environment variables
 func Load() (*Config, error) {
 	cfg := &Config{}
@@ -52,6 +59,11 @@ func Load() (*Config, error) {
 	// Set defaults manually if envconfig didn't set them
 	if cfg.Server.Port == 0 {
 		cfg.Server.Port = 8080
+	}
+
+	// Set default JWT expiration if not set
+	if cfg.JWT.Expiration == 0 {
+		cfg.JWT.Expiration = 24 * time.Hour
 	}
 
 	return cfg, nil
