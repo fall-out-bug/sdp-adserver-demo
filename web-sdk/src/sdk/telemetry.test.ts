@@ -6,7 +6,6 @@ import {
   getLogger,
   getErrorTracker,
   resetTelemetry,
-  type LogEntry,
 } from './telemetry.js';
 
 describe('Logger', () => {
@@ -15,7 +14,7 @@ describe('Logger', () => {
 
   beforeEach(() => {
     logger = new Logger({ level: LogLevel.DEBUG, enableConsole: true });
-    consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {}) as any;
   });
 
   afterEach(() => {

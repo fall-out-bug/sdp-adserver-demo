@@ -1,9 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   injectDirect,
   trackImpression,
   applyStyleIsolation,
-  type DirectInjectionOptions,
 } from './direct.js';
 import type { CachedBanner } from '../cache.js';
 

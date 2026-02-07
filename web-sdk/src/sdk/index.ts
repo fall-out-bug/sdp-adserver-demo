@@ -3,6 +3,8 @@
  * Lightweight JavaScript SDK for ad delivery
  */
 
+import { AdServerSDK } from './core.js';
+
 // Core exports
 export { AdServerSDK, getSDK, initSDK } from './core.js';
 

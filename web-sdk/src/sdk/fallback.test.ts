@@ -1,10 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   getFallbackHTML,
   renderFallback,
   createFallbackElement,
   showPSA,
-  type FallbackConfig,
 } from './fallback.js';
 
 describe('Fallback', () => {

@@ -206,7 +206,7 @@ async function injectInIframe(
 /**
  * Render fallback banner
  */
-function renderFallback(container: HTMLElement, error: Error): RenderResult {
+function renderFallback(container: HTMLElement, _error: Error): RenderResult {
   const fallbackHTML = `
     <div class="adserver-fallback" style="
       width: 300px;

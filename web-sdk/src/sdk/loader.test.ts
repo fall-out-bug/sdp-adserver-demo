@@ -7,7 +7,6 @@ import {
   getLoadStateDetails,
   getLoadMetrics,
   clearLoadStates,
-  type LoadOptions,
 } from './loader.js';
 
 describe('Loader', () => {
@@ -18,7 +17,6 @@ describe('Loader', () => {
     clearLoadStates();
 
     // Track script elements
-    const scripts = new Map<string, any>();
 
     createElementMock = vi.fn((tag: string) => {
       if (tag === 'script') {
@@ -29,17 +27,17 @@ describe('Loader', () => {
           onerror: null,
           addEventListener: vi.fn(),
         };
-        return script;
+        return script as any;
       }
       if (tag === 'link') {
         return {
           rel: '',
           as: '',
           href: '',
-        };
+        } as any;
       }
-      return {};
-    });
+      return {} as any;
+    }) as any;
 
     appendChildMock = vi.fn((node: any) => {
       // Simulate successful load after delay
@@ -86,7 +84,6 @@ describe('Loader', () => {
 
     it('should handle load error', async () => {
       // Override appendChild to simulate error
-      const originalAppendChild = appendChildMock;
       appendChildMock = vi.fn((node: any) => {
         setTimeout(() => {
           if (node.onerror) node.onerror(new Error('Load failed'));

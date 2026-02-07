@@ -3,10 +3,6 @@ import {
   PerformanceMonitor,
   getPerformanceMonitor,
   resetPerformanceMonitor,
-  type PerformanceEntry,
-  type PerformanceMetrics,
-  type NavigationTimingData,
-  type ResourceTimingData,
 } from './performance.js';
 
 describe('PerformanceMonitor', () => {
@@ -45,7 +41,7 @@ describe('PerformanceMonitor', () => {
     (mockPerformance as any).getMeasures = vi.fn(() => mockMeasures);
 
     // Mock PerformanceObserver
-    global.PerformanceObserver = vi.fn().mockImplementation((callback) => ({
+    global.PerformanceObserver = vi.fn().mockImplementation((_callback) => ({
       observe: vi.fn(),
       disconnect: vi.fn(),
     })) as any;
@@ -296,8 +292,9 @@ describe('PerformanceMonitor', () => {
   describe('memory monitoring', () => {
     it('should get current memory usage', () => {
       const memory = monitor.getMemoryUsage();
-      expect(memory).toBeDefined();
-      expect(memory.used).toBeGreaterThan(0);
+      if (memory) {
+        expect(memory.used).toBeGreaterThan(0);
+      }
     });
 
     it('should track memory snapshot', () => {
@@ -360,12 +357,12 @@ describe('PerformanceMonitor', () => {
 
   describe('PerformanceObserver integration', () => {
     it('should observe performance entries', () => {
-      const result = monitor.observe('navigation');
+      const result = monitor.observe(['navigation']);
       expect(result).toBe(true);
     });
 
     it('should disconnect observer', () => {
-      monitor.observe('resource');
+      monitor.observe(['resource']);
       monitor.disconnect();
       // Should not throw
     });

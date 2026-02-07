@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { EventEmitter, resetEventEmitter, getEventEmitter } from './events.js';
 
 describe('EventEmitter', () => {
@@ -164,6 +164,10 @@ describe('EventEmitter', () => {
 });
 
 describe('Global EventEmitter', () => {
+  beforeEach(() => {
+    resetEventEmitter();
+  });
+
   afterEach(() => {
     resetEventEmitter();
   });

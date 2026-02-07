@@ -3,11 +3,10 @@ import {
   renderBanner,
   detectContainerSize,
   autoRender,
-  type RenderOptions,
 } from './render.js';
-import { getCachedBanner, setCachedBanner, clearCache } from './cache.js';
-import { fetchBannerCached, createDeliveryRequest } from './client.js';
 import type { CachedBanner } from './cache.js';
+import { getCachedBanner, setCachedBanner } from './cache.js';
+import { fetchBannerCached } from './client.js';
 
 // Mock dependencies
 vi.mock('./cache.js');

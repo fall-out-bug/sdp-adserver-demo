@@ -3,7 +3,6 @@ import {
   AdServerSDK,
   getSDK,
   initSDK,
-  type SDKInitOptions,
 } from './core.js';
 import { resetEventEmitter } from './events.js';
 import { resetTelemetry, LogLevel } from './telemetry.js';
@@ -124,8 +123,6 @@ describe('AdServerSDK', () => {
 
     it('should register event listener with on', () => {
       const listener = vi.fn();
-      sdk.on('test', listener);
-      sdk.emit = vi.fn();
       // Event is emitted through internal emitter
       expect(() => sdk.on('test', listener)).not.toThrow();
     });

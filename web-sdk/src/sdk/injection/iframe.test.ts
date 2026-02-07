@@ -5,7 +5,6 @@ import {
   createResponsiveIframe,
   cleanupIframe,
   configureAllowedOrigins,
-  type IframeInjectionOptions,
 } from './iframe.js';
 import type { CachedBanner } from '../cache.js';
 

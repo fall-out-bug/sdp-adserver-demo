@@ -5,7 +5,6 @@ import {
   resetDebugManager,
   LogLevel,
   type DebugConfig,
-  type DebugOverlay,
   type DebugEvent,
 } from './debug.js';
 
@@ -17,9 +16,9 @@ describe('DebugManager', () => {
 
   beforeEach(() => {
     debugManager = new DebugManager({ enabled: true });
-    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {}) as any;
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {}) as any;
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {}) as any;
     vi.stubGlobal('window', {
       location: { href: 'http://localhost' },
     });
@@ -288,7 +287,7 @@ describe('DebugManager', () => {
     it('should get memory diff', () => {
       debugManager.trackMemory('start');
       // Simulate some memory allocation
-      const temp = new Array(1000).fill('test');
+      new Array(1000).fill('test');
       debugManager.trackMemory('end');
       const diff = debugManager.getMemoryDiff('start', 'end');
       expect(diff).toBeGreaterThanOrEqual(0);

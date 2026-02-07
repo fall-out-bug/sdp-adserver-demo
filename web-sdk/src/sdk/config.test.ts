@@ -8,7 +8,6 @@ import {
   setConfig,
   validateConfig,
   resetConfig,
-  type SDKConfig,
   type InternalConfig,
 } from './config.js';
 

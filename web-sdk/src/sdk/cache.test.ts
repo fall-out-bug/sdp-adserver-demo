@@ -7,7 +7,7 @@ import {
   getCacheSize,
   type CachedBanner,
 } from './cache.js';
-import { resetConfig, getConfig } from './config.js';
+import { resetConfig } from './config.js';
 
 describe('Cache', () => {
   const mockBanner: CachedBanner = {

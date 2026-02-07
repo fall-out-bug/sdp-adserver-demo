@@ -365,7 +365,7 @@ describe('CSP Nonce', () => {
   it('should use nonce in sanitized HTML when set', () => {
     setNonce('my-nonce');
     const html = '<style>.test { color: red; }</style>';
-    const result = sanitizeHtml(html);
+    sanitizeHtml(html);
     // The nonce may be added to style/script tags for CSP compliance
   });
 });

@@ -11,15 +11,6 @@ export interface FallbackConfig {
   textColor?: string;
 }
 
-const DEFAULT_FALLBACK_HTML = `
-  <div class="adserver-fallback" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border: 1px dashed #ccc; text-align: center; padding: 20px; font-family: Arial, sans-serif; font-size: 14px; color: #666;">
-    <div>
-      <p style="margin: 0; font-weight: bold;">Advertisement</p>
-      <p style="margin: 5px 0 0 0; font-size: 12px; color: #999;">Temporarily unavailable</p>
-    </div>
-  </div>
-`;
-
 /**
  * Get fallback HTML
  */

@@ -15,7 +15,6 @@ import {
   validateRetryDelay,
   ValidationErrorCode,
   ValidationError,
-  type ValidationResult,
 } from './validation.js';
 
 describe('validateSlotId', () => {

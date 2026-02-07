@@ -13,8 +13,8 @@ describe('Client', () => {
   let mockFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    mockFetch = vi.fn();
-    global.fetch = mockFetch;
+    mockFetch = vi.fn() as any;
+    global.fetch = mockFetch as any;
     resetConfig();
     setConfig({ apiEndpoint: 'https://api.test.com' });
   });
