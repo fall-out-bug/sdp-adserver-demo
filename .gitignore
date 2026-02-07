@@ -80,10 +80,35 @@ Thumbs.db
 artifacts/
 archive/
 .oneshot
+.beads/
+.beads-sdp-mapping.jsonl
+.claude/
+.sdp/
+.cursor/
+.opencode/
+scripts/check_workstreams.py
+scripts/regenerate_workstreams.py
+scripts/test-beads.sh
+scripts/verify-beads-setup.sh
+hooks/post-oneshot.sh
 
-# Temporary status files
-*_STATUS.md
-*_PROGRESS.md
+# SDP docs and workstreams (development artifacts)
+docs/workstreams/
+docs/drafts/
+docs/beads-integration/
+docs/setup/beads-installation.md
+docs/migrations/bc-006-beads-integration.md
+docs/runbooks/beads-migration.md
+docs/runbooks/oneshot-runbook.md
+docs/plans/*-plan.md
+
+# SDP plugin
+sdp-plugin/.beads/
+sdp-plugin/.claudeignore
+sdp-plugin/docs/drafts/
+sdp-plugin/docs/workflows/
+sdp-plugin/docs/workstreams/
+sdp-plugin/prompts/skills/
 
 # Python SDP (deprecated/archived 2026-02-06)
 src/sdp-deprecated/
