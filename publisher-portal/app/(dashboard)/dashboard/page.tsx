@@ -78,16 +78,16 @@ export default function DashboardPage() {
                   <tr key={placement.id} className="border-b hover:bg-gray-50">
                     <td className="py-3 px-4 font-medium">{placement.name}</td>
                     <td className="text-right py-3 px-4">
-                      {placement.impressions?.toLocaleString('ru-RU') || '—'}
+                      {'—'}
                     </td>
                     <td className="text-right py-3 px-4">
-                      {placement.clicks?.toLocaleString('ru-RU') || '—'}
+                      {'—'}
                     </td>
                     <td className="text-right py-3 px-4 font-semibold">
-                      {placement.revenue ? `$${placement.revenue.toFixed(2)}` : '—'}
+                      {'—'}
                     </td>
                     <td className="text-right py-3 px-4">
-                      {placement.ecpm ? `$${placement.ecpm.toFixed(2)}` : '—'}
+                      {'—'}
                     </td>
                   </tr>
                 ))}

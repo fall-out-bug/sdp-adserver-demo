@@ -1,0 +1,2 @@
+# E2E tests are skipped for now
+# They require a running dev server and mocked backend
