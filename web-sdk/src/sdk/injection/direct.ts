@@ -2,6 +2,7 @@
  * Direct HTML Injection
  */
 
+import { sanitizeHtml } from '../sanitize.js';
 import type { CachedBanner } from '../cache.js';
 
 export interface DirectInjectionOptions {
@@ -35,8 +36,8 @@ export function injectDirect(
     ${wrapperStyle}
   `;
 
-  // Inject HTML
-  wrapper.innerHTML = banner.html;
+  // Inject HTML (sanitized for XSS prevention)
+  wrapper.innerHTML = sanitizeHtml(banner.html);
 
   // Setup click tracking
   if (enableClickTracking) {

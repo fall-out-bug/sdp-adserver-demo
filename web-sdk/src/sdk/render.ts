@@ -4,6 +4,7 @@
 
 import { getCachedBanner, setCachedBanner, type CachedBanner } from './cache.js';
 import { fetchBannerCached, createDeliveryRequest } from './client.js';
+import { sanitizeHtml } from './sanitize.js';
 
 export interface RenderOptions {
   width?: number;
@@ -125,8 +126,8 @@ function injectDirect(container: HTMLElement, banner: CachedBanner): void {
   wrapper.style.display = 'inline-block';
   wrapper.style.position = 'relative';
 
-  // Inject HTML
-  wrapper.innerHTML = banner.html;
+  // Inject HTML (sanitized for XSS prevention)
+  wrapper.innerHTML = sanitizeHtml(banner.html);
 
   // Setup click tracking
   setupClickTracking(wrapper, banner.clickURL);
@@ -171,7 +172,7 @@ async function injectInIframe(
               </style>
             </head>
             <body>
-              ${banner.html}
+              ${sanitizeHtml(banner.html)}
               <script>
                 // Setup click tracking in iframe
                 document.body.addEventListener('click', function(e) {
