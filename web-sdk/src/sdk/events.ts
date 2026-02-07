@@ -129,8 +129,8 @@ export class EventEmitter {
       this._eventCount.set(event, 0);
     }
 
-    const count = this._eventCount.get(event)!;
-    if (count >= this._maxListeners) {
+    const count = this._eventCount.get(event);
+    if (count !== undefined && count >= this._maxListeners) {
       console.warn(
         `Possible memory leak detected. ${count} listeners registered for "${String(event)}". Max: ${this._maxListeners}`
       );

@@ -2,7 +2,7 @@
  * Debug Manager - Main DebugManager class implementation
  */
 
-import type { DebugConfig, DebugEvent, DebugOverlay, DebugStatistics } from './debug-types.js';
+import type { DebugConfig } from './debug-types.js';
 import { LogLevel, DebugLogger } from './debug-logging.js';
 import { DebugEventTracker } from './debug-events.js';
 import { DebugCounter } from './debug-counters.js';

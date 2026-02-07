@@ -2,9 +2,6 @@
  * Render Core - Core render functionality
  */
 
-import type { CachedBanner } from '../cache.js';
-import type { RenderOptions, RenderResult } from './index.js';
-
 /**
  * Detect container size using ResizeObserver or getBoundingClientRect
  */

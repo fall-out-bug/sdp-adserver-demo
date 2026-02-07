@@ -142,8 +142,8 @@ const sdk = AdServerSDK.getInstance();
 
 // Auto-expose to window for browser usage
 if (typeof window !== 'undefined') {
-  (window as any).AdServerSDK = AdServerSDK;
-  (window as any).adserver = sdk;
+  (window as { AdServerSDK?: typeof AdServerSDK; adserver?: typeof sdk }).AdServerSDK = AdServerSDK;
+  (window as { adserver?: typeof sdk }).adserver = sdk;
 }
 
 export default sdk;

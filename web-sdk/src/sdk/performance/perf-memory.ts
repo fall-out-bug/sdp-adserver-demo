@@ -27,11 +27,17 @@ export class MemoryTracker {
    * Get current memory usage
    */
   getMemoryUsage(): { used: number; total: number; limit: number } | null {
-    if (typeof performance === 'undefined' || !(performance as any).memory) {
+    if (typeof performance === 'undefined' || !('memory' in performance)) {
       return null;
     }
 
-    const memory = (performance as any).memory;
+    // Type assertion for performance.memory (non-standard API)
+    const perfMemory = (performance as { memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+    if (!perfMemory) {
+      return null;
+    }
+
+    const memory = perfMemory;
     return {
       used: memory.usedJSHeapSize,
       total: memory.totalJSHeapSize,
@@ -43,7 +49,8 @@ export class MemoryTracker {
    * Track memory snapshot
    */
   trackMemory(label: string): void {
-    if (!(this._monitor as any).isEnabled()) return;
+    const monitor = this._monitor as { isEnabled?: () => boolean };
+    if (monitor.isEnabled && !monitor.isEnabled()) return;
 
     const memory = this.getMemoryUsage();
     if (!memory) return;
@@ -57,7 +64,8 @@ export class MemoryTracker {
     this._memorySnapshots.push(snapshot);
 
     // Limit snapshots
-    const maxSnapshots = (this._monitor as any)._config?.maxMemorySnapshots ?? 50;
+    const monitorConfig = this._monitor as { _config?: { maxMemorySnapshots?: number } };
+    const maxSnapshots = monitorConfig._config?.maxMemorySnapshots ?? 50;
     if (this._memorySnapshots.length > maxSnapshots) {
       this._memorySnapshots.shift();
     }

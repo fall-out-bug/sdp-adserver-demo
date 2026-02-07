@@ -85,7 +85,7 @@ export class DebugLogger {
     switch (level) {
       case LogLevel.DEBUG:
       case LogLevel.INFO:
-        console.log(prefix, timestamp, message, data ?? '');
+        console.warn(prefix, timestamp, message, data ?? '');
         break;
       case LogLevel.WARN:
         console.warn(prefix, timestamp, message, data ?? '');

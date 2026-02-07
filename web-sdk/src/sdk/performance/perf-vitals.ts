@@ -47,16 +47,20 @@ export class CoreWebVitalsTracker {
               this._vitals.lcp = entry.startTime;
               this._vitals.lcpGood = entry.startTime <= 2500;
               break;
-            case 'first-input':
-              this._vitals.fid = (entry as any).processingStart - entry.startTime;
+            case 'first-input': {
+              const fidEntry = entry as PerformanceEventTiming & { processingStart: number };
+              this._vitals.fid = fidEntry.processingStart - entry.startTime;
               this._vitals.fidGood = this._vitals.fid <= 100;
               break;
-            case 'layout-shift':
-              if (!(entry as any).hadRecentInput) {
-                this._vitals.cls += (entry as any).value;
+            }
+            case 'layout-shift': {
+              const clsEntry = entry as { hadRecentInput: boolean; value: number };
+              if (!clsEntry.hadRecentInput) {
+                this._vitals.cls += clsEntry.value;
                 this._vitals.clsGood = this._vitals.cls <= 0.1;
               }
               break;
+            }
           }
         }
       });

@@ -57,14 +57,10 @@ export {
 
 import { PerformanceMonitor as PerfMonitor } from './perf-full.js';
 import { MetricsAggregator } from './perf-metrics.js';
-import type { MemorySnapshot } from './perf-memory.js';
-import type { PerformanceConfig, PerformanceEntry, OperationMetric } from './perf-core.js';
-import type { CoreWebVitals } from './perf-vitals.js';
-import type { PerformanceMetrics } from './perf-metrics.js';
 
 // Extend PerformanceMonitor with export functionality
 Object.assign(PerfMonitor.prototype, {
-  getMetricsSummary: function(this: any) {
+  getMetricsSummary: function(this: unknown) {
     const metrics = this.getMetrics();
     const vitals = this.getCoreWebVitals();
 
@@ -89,7 +85,7 @@ Object.assign(PerfMonitor.prototype, {
       resourceCount: metrics.resourceCount,
     };
   },
-  export: function(this: any) {
+  export: function(this: unknown) {
     return {
       marks: this.getCustomMarks(),
       operations: this.getOperationMetrics(),
@@ -99,7 +95,7 @@ Object.assign(PerfMonitor.prototype, {
       thresholds: Object.fromEntries(this._operations.getThresholds ? this._operations.getThresholds() : []),
     };
   },
-  import: function(this: any, data: any) {
+  import: function(this: unknown, data: { marks?: string[]; operations?: unknown[] }) {
     if (data.marks) {
       this._marks.importMarks(data.marks);
     }
@@ -108,16 +104,16 @@ Object.assign(PerfMonitor.prototype, {
       this._operations.importOperations(data.operations);
     }
   },
-  toJSON: function(this: any) {
+  toJSON: function(this: unknown) {
     return JSON.stringify(this.export());
   },
-  formatDuration: function(this: any, ms: number) {
+  formatDuration: function(this: unknown, ms: number) {
     return MetricsAggregator.formatDuration(ms);
   },
-  formatBytes: function(this: any, bytes: number) {
+  formatBytes: function(this: unknown, bytes: number) {
     return MetricsAggregator.formatBytes(bytes);
   },
-  getRating: function(this: any, value: number, metric: any) {
+  getRating: function(this: unknown, value: number, metric: 'pageLoad' | 'lcp' | 'fid') {
     return MetricsAggregator.getRating(value, metric);
   },
 });

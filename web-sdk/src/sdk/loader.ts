@@ -147,7 +147,7 @@ export async function loadScriptsWithPriority(
     // Use requestIdleCallback if available, otherwise setTimeout
     if ('requestIdleCallback' in window) {
       await new Promise<void>(resolve => {
-        (window as any).requestIdleCallback(() => {
+        (window as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(() => {
           loadScripts(deferred, options).then(() => resolve());
         });
       });

@@ -93,12 +93,12 @@ describe('DebugManager', () => {
     it('should log debug message', () => {
       debugManager.setLogLevel(LogLevel.DEBUG);
       debugManager.debug('test debug', { foo: 'bar' });
-      expect(consoleLogSpy).toHaveBeenCalled();
+      expect(consoleWarnSpy).toHaveBeenCalled();
     });
 
     it('should log info message', () => {
       debugManager.info('test info');
-      expect(consoleLogSpy).toHaveBeenCalled();
+      expect(consoleWarnSpy).toHaveBeenCalled();
     });
 
     it('should log warning message', () => {

@@ -96,7 +96,7 @@ export async function fetchBanner(
   for (let attempt = 0; attempt <= (retryEnabled ? retryMaxAttempts : 0); attempt++) {
     if (attempt > 0) {
       const delay = getRetryDelay(attempt - 1);
-      console.log(`[AdServerSDK] Retry attempt ${attempt}/${retryMaxAttempts} after ${delay}ms`);
+      console.warn(`[AdServerSDK] Retry attempt ${attempt}/${retryMaxAttempts} after ${delay}ms`);
       await sleep(delay);
     }
 

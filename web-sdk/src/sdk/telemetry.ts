@@ -141,10 +141,10 @@ export class Logger {
 
     switch (entry.level) {
       case LogLevel.DEBUG:
-        console.debug(message, entry.context ?? '');
+        console.warn(message, entry.context ?? '');
         break;
       case LogLevel.INFO:
-        console.info(message, entry.context ?? '');
+        console.warn(message, entry.context ?? '');
         break;
       case LogLevel.WARN:
         console.warn(message, entry.context ?? '');
@@ -187,7 +187,7 @@ export class ErrorTracker {
     }
 
     // Also log to console in development
-    if (typeof window !== 'undefined' && (window as any).__ADSERVER_DEBUG__) {
+    if (typeof window !== 'undefined' && (window as { __ADSERVER_DEBUG__?: boolean }).__ADSERVER_DEBUG__) {
       console.error('[AdServerSDK] Error captured:', entry);
     }
   }

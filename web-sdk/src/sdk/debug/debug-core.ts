@@ -228,7 +228,7 @@ export class DebugManager {
   /**
    * Get all memory snapshots
    */
-  getMemorySnapshots(): any[] {
+  getMemorySnapshots(): unknown[] {
     return this._memory.getMemorySnapshots();
   }
 
@@ -304,7 +304,7 @@ export class DebugManager {
   export(): {
     events: DebugEvent[];
     counters: Record<string, number>;
-    timers: any[];
+    timers: unknown[];
     config: DebugConfig;
     overlay: DebugOverlay;
   } {

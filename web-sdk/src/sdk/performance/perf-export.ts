@@ -2,7 +2,7 @@
  * Performance Export - Export and formatting functionality for PerformanceMonitor
  */
 
-import type { PerformanceConfig, PerformanceEntry, OperationMetric } from './perf-core.js';
+import type { PerformanceConfig, OperationMetric } from './perf-core.js';
 import type { MemorySnapshot } from './perf-memory.js';
 import type { CoreWebVitals } from './perf-vitals.js';
 import type { PerformanceMetrics } from './perf-metrics.js';

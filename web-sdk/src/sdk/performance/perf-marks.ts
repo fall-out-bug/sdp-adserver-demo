@@ -136,7 +136,7 @@ export class PerformanceMarks extends PerformanceMonitorBase {
     if (typeof performance !== 'undefined') {
       try {
         const entries = performance.getEntriesByType?.('measure') ?? [];
-        apiMeasures = entries.map((e: any) => ({
+        apiMeasures = entries.map((e: PerformanceEntry) => ({
           name: e.name,
           startTime: e.startTime,
           duration: e.duration,

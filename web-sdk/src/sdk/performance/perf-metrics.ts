@@ -42,7 +42,7 @@ export class MetricsAggregator {
     try {
       const resources = performance.getEntriesByName?.(url, 'resource') ?? [];
       if (resources.length > 0) {
-        const r = resources[0] as any;
+        const r = resources[0] as PerformanceResourceTiming;
         return {
           name: r.name,
           url: r.name,
@@ -67,7 +67,7 @@ export class MetricsAggregator {
 
     try {
       const resources = performance.getEntriesByType?.('resource') ?? [];
-      return resources.map((r: any) => ({
+      return resources.map((r: PerformanceResourceTiming) => ({
         name: r.name,
         url: r.name,
         duration: r.duration,
@@ -109,7 +109,7 @@ export class MetricsAggregator {
     if (typeof performance === 'undefined') return null;
 
     try {
-      const timing = performance.getEntriesByType?.('navigation')?.[0] as any;
+      const timing = performance.getEntriesByType?.('navigation')?.[0] as PerformanceNavigationTiming | undefined;
       if (!timing) return null;
 
       const paintEntries = performance.getEntriesByType?.('paint') ?? [];

@@ -3,7 +3,6 @@
  */
 
 import type { DebugConfig, MemorySnapshot } from './debug-types.js';
-import type { LogLevel } from './debug-logging.js';
 
 /**
  * DebugMemory class for memory tracking
@@ -33,18 +32,23 @@ export class DebugMemory {
 
     if (
       typeof performance === 'undefined' ||
-      !(performance as any).memory
+      !('memory' in performance)
     ) {
       this._warn('Memory API not available');
       return null;
     }
 
-    const memory = (performance as any).memory;
+    // Type assertion for performance.memory (non-standard API)
+    const perfMemory = (performance as { memory?: { usedJSHeapSize: number; totalJSHeapSize: number } }).memory;
+    if (!perfMemory) {
+      this._warn('Memory API not available');
+      return null;
+    }
     const snapshot: MemorySnapshot = {
       label,
       timestamp: Date.now(),
-      usedJSHeapSize: memory.usedJSHeapSize,
-      totalJSHeapSize: memory.totalJSHeapSize,
+      usedJSHeapSize: perfMemory.usedJSHeapSize,
+      totalJSHeapSize: perfMemory.totalJSHeapSize,
     };
 
     this._memorySnapshots.push(snapshot);
@@ -54,7 +58,7 @@ export class DebugMemory {
       this._memorySnapshots.shift();
     }
 
-    return memory.usedJSHeapSize;
+    return perfMemory.usedJSHeapSize;
   }
 
   /**

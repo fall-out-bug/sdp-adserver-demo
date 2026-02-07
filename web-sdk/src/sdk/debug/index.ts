@@ -27,7 +27,7 @@ export {
   TimerTracker,
 } from './debug-timers.js';
 
-import { DebugManager as DebugCore, LogLevel, type DebugConfig, type DebugEvent, type DebugOverlay, type DebugStatistics } from './debug-core.js';
+import { DebugManager as DebugCore, type DebugConfig, type DebugEvent, type DebugOverlay, type DebugStatistics } from './debug-core.js';
 import { TimerTracker, type TimerEntry } from './debug-timers.js';
 
 /**

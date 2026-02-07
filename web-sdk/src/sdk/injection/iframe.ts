@@ -221,7 +221,7 @@ export function createResponsiveIframe(
       // Return cleanup function
       iframe.addEventListener('load', () => {
         // Store cleanup function on iframe element
-        (iframe as any)._resizeObserver = resizeObserver;
+        (iframe as { _resizeObserver?: ResizeObserver })._resizeObserver = resizeObserver;
       });
     }
 
@@ -234,10 +234,10 @@ export function createResponsiveIframe(
  */
 export function cleanupIframe(iframe: HTMLIFrameElement): void {
   // Stop resize observer if exists
-  const resizeObserver = (iframe as any)._resizeObserver;
+  const resizeObserver = (iframe as { _resizeObserver?: ResizeObserver })._resizeObserver;
   if (resizeObserver) {
     resizeObserver.disconnect();
-    delete (iframe as any)._resizeObserver;
+    delete (iframe as { _resizeObserver?: ResizeObserver })._resizeObserver;
   }
 
   // Remove iframe from DOM

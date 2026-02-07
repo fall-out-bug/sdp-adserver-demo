@@ -13,7 +13,7 @@ export interface RenderOptions {
 export interface RenderResult {
   success: boolean;
   method: 'direct' | 'iframe' | 'fallback' | 'cache';
-  banner?: any;
+  banner?: CachedBanner;
   error?: Error;
 }
 
@@ -35,7 +35,6 @@ export {
 // Re-import for use in renderBanner
 import { getCachedBanner, setCachedBanner, type CachedBanner } from '../cache.js';
 import { fetchBannerCached, createDeliveryRequest } from '../client.js';
-import { detectContainerSize } from './render-core.js';
 import { injectDirect, injectInIframe } from './render-inject.js';
 import { renderFallback } from './render-fallback.js';
 

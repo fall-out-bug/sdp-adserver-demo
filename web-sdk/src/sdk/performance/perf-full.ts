@@ -6,8 +6,6 @@ import { PerformanceMonitor as PerfCore } from './perf-core.js';
 import { MemoryTracker } from './perf-memory.js';
 import { CoreWebVitalsTracker, type CoreWebVitals } from './perf-vitals.js';
 import { MetricsAggregator, type PerformanceMetrics, type NavigationTimingData, type ResourceTimingData } from './perf-metrics.js';
-import type { MemorySnapshot } from './perf-memory.js';
-import type { PerformanceConfig, PerformanceEntry, OperationMetric } from './perf-core.js';
 
 /**
  * Extended PerformanceMonitor class with all functionality
