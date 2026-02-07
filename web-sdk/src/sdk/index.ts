@@ -69,6 +69,40 @@ export {
   type LoadState,
 } from './loader.js';
 
+// Render exports
+export {
+  renderBanner,
+  detectContainerSize,
+  autoRender,
+  type RenderOptions,
+  type RenderResult,
+} from './render.js';
+
+// Fallback exports
+export {
+  getFallbackHTML,
+  renderFallback,
+  createFallbackElement,
+  showPSA,
+  type FallbackConfig,
+} from './fallback.js';
+
+// Injection exports
+export {
+  injectDirect,
+  trackImpression,
+  applyStyleIsolation,
+  type DirectInjectionOptions,
+} from './injection/direct.js';
+
+export {
+  injectInIframe,
+  setupIframeMessageListener,
+  createResponsiveIframe,
+  cleanupIframe,
+  type IframeInjectionOptions,
+} from './injection/iframe.js';
+
 // Version
 export const VERSION = '0.1.0';
 
