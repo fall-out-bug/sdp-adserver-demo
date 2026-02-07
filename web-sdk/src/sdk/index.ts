@@ -35,6 +35,40 @@ export {
   type ErrorEntry,
 } from './telemetry.js';
 
+// Cache exports
+export {
+  getCachedBanner,
+  setCachedBanner,
+  removeCachedBanner,
+  clearCache,
+  getCacheSize,
+  type CachedBanner,
+} from './cache.js';
+
+// Client exports
+export {
+  fetchBanner,
+  fetchBannerCached,
+  getDeliveryURL,
+  createDeliveryRequest,
+  type DeliveryRequest,
+  type DeliveryResponse,
+} from './client.js';
+
+// Loader exports
+export {
+  loadScript,
+  preloadScript,
+  loadScripts,
+  loadScriptsWithPriority,
+  getLoadState,
+  getLoadStateDetails,
+  getLoadMetrics,
+  clearLoadStates,
+  type LoadOptions,
+  type LoadState,
+} from './loader.js';
+
 // Version
 export const VERSION = '0.1.0';
 
