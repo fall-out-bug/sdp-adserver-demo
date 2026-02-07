@@ -4,6 +4,7 @@ import {
   setupIframeMessageListener,
   createResponsiveIframe,
   cleanupIframe,
+  configureAllowedOrigins,
   type IframeInjectionOptions,
 } from './iframe.js';
 import type { CachedBanner } from '../cache.js';
@@ -86,6 +87,111 @@ describe('Iframe Injection', () => {
       const cleanup = setupIframeMessageListener(vi.fn());
       expect(typeof cleanup).toBe('function');
       expect(() => cleanup()).not.toThrow();
+    });
+
+    describe('origin validation', () => {
+      let callback: ReturnType<typeof vi.fn>;
+      let cleanup: ReturnType<typeof setupIframeMessageListener>;
+
+      beforeEach(() => {
+        callback = vi.fn();
+        cleanup = setupIframeMessageListener(callback);
+      });
+
+      afterEach(() => {
+        cleanup();
+      });
+
+      it('should allow messages from same origin', () => {
+        const messageEvent = new MessageEvent('message', {
+          origin: window.location.origin,
+          data: { type: 'adserver-click', url: 'https://example.com' },
+        });
+
+        window.dispatchEvent(messageEvent);
+        expect(callback).toHaveBeenCalledWith({
+          type: 'adserver-click',
+          url: 'https://example.com',
+        });
+      });
+
+      it('should reject messages from different origin', () => {
+        const messageEvent = new MessageEvent('message', {
+          origin: 'https://evil.com',
+          data: { type: 'adserver-click', url: 'https://example.com' },
+        });
+
+        window.dispatchEvent(messageEvent);
+        expect(callback).not.toHaveBeenCalled();
+      });
+
+      it('should reject messages from untrusted origins', () => {
+        const messageEvent = new MessageEvent('message', {
+          origin: 'https://evil.com',
+          data: { type: 'adserver-click', url: 'https://example.com' },
+        });
+
+        window.dispatchEvent(messageEvent);
+        expect(callback).not.toHaveBeenCalled();
+      });
+
+      it('should allow messages from configured allowlist', () => {
+        configureAllowedOrigins(['https://trusted.com']);
+
+        const messageEvent = new MessageEvent('message', {
+          origin: 'https://trusted.com',
+          data: { type: 'adserver-click', url: 'https://example.com' },
+        });
+
+        window.dispatchEvent(messageEvent);
+        expect(callback).toHaveBeenCalledWith({
+          type: 'adserver-click',
+          url: 'https://example.com',
+        });
+      });
+
+      it('should ignore messages with wrong type', () => {
+        const messageEvent = new MessageEvent('message', {
+          origin: window.location.origin,
+          data: { type: 'wrong-type', url: 'https://example.com' },
+        });
+
+        window.dispatchEvent(messageEvent);
+        expect(callback).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('configureAllowedOrigins', () => {
+    it('should configure allowed origins', () => {
+      expect(() => configureAllowedOrigins(['https://trusted.com'])).not.toThrow();
+    });
+
+    it('should normalize origins', () => {
+      configureAllowedOrigins([
+        'https://trusted.com/path',  // Should be normalized to origin
+        'https://another.com',
+      ]);
+
+      const callback = vi.fn();
+      const cleanup = setupIframeMessageListener(callback);
+
+      // Should accept normalized origin
+      const messageEvent = new MessageEvent('message', {
+        origin: 'https://trusted.com',
+        data: { type: 'adserver-click', url: 'https://example.com' },
+      });
+
+      window.dispatchEvent(messageEvent);
+      expect(callback).toHaveBeenCalled();
+
+      cleanup();
+    });
+
+    it('should skip invalid origins', () => {
+      expect(() =>
+        configureAllowedOrigins(['not-a-url', 'https://valid.com'])
+      ).not.toThrow();
     });
   });
 

@@ -111,7 +111,7 @@ function injectContent(iframe: HTMLIFrameElement, banner: CachedBanner): void {
                   type: 'adserver-click',
                   url: '${banner.clickURL}',
                   referrer: window.location.href
-                }, '*');
+                }, window.location.origin);
               }
             }
             document.body.addEventListener('click', handleClick);
@@ -124,12 +124,61 @@ function injectContent(iframe: HTMLIFrameElement, banner: CachedBanner): void {
 }
 
 /**
+ * Allowed origins for iframe communication
+ * In production, this should be configured via SDK config
+ */
+const ALLOWED_ORIGINS = new Set<string>();
+
+/**
+ * Configure allowed origins for iframe communication
+ */
+export function configureAllowedOrigins(origins: string[]): void {
+  ALLOWED_ORIGINS.clear();
+  for (const origin of origins) {
+    try {
+      // Validate and normalize origin URL
+      const url = new URL(origin);
+      ALLOWED_ORIGINS.add(url.origin);
+    } catch {
+      // Skip invalid origins
+    }
+  }
+}
+
+/**
+ * Check if origin is allowed
+ */
+function isOriginAllowed(origin: string): boolean {
+  // Always allow same origin
+  if (origin === window.location.origin) {
+    return true;
+  }
+
+  // Check configured allowlist
+  if (ALLOWED_ORIGINS.has(origin)) {
+    return true;
+  }
+
+  // In development, allow localhost with exact match (no subdomains)
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    try {
+      const url = new URL(origin);
+      return url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+    } catch {
+      return false;
+    }
+  }
+
+  return false;
+}
+
+/**
  * Setup message listener for iframe communication
  */
 export function setupIframeMessageListener(callback: (data: { type: string; url?: string; referrer?: string }) => void): () => void {
   const listener = (event: MessageEvent) => {
-    // Validate origin (in production, check specific origins)
-    if (event.origin !== window.location.origin && !event.origin.includes('localhost')) {
+    // Validate origin with strict checking
+    if (!isOriginAllowed(event.origin)) {
       return;
     }
 

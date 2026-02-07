@@ -160,6 +160,7 @@ async function injectInIframe(
       // Inject content into iframe
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
       if (doc) {
+        const parentOrigin = window.location.origin;
         doc.open();
         doc.write(`
           <!DOCTYPE html>
@@ -175,16 +176,19 @@ async function injectInIframe(
               ${sanitizeHtml(banner.html)}
               <script>
                 // Setup click tracking in iframe
-                document.body.addEventListener('click', function(e) {
-                  const target = e.target.closest('a');
-                  if (target) {
-                    e.preventDefault();
-                    window.parent.postMessage({
-                      type: 'adserver-click',
-                      url: '${banner.clickURL}'
-                    }, '*');
-                  }
-                });
+                (function() {
+                  const parentOrigin = "${parentOrigin}";
+                  document.body.addEventListener('click', function(e) {
+                    const target = e.target.closest('a');
+                    if (target) {
+                      e.preventDefault();
+                      window.parent.postMessage({
+                        type: 'adserver-click',
+                        url: '${banner.clickURL}'
+                      }, parentOrigin);
+                    }
+                  });
+                })();
               </script>
             </body>
           </html>
