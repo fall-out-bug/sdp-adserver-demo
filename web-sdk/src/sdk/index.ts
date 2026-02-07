@@ -103,6 +103,35 @@ export {
   type IframeInjectionOptions,
 } from './injection/iframe.js';
 
+// Debug exports
+export {
+  DebugManager,
+  getDebugManager,
+  resetDebugManager,
+  LogLevel as DebugLogLevel,
+  type DebugConfig,
+  type DebugEvent,
+  type DebugOverlay,
+  type TimerEntry,
+  type MemorySnapshot,
+  type DebugStatistics,
+  type DebugBorderOptions,
+} from './debug.js';
+
+// Performance exports
+export {
+  PerformanceMonitor,
+  getPerformanceMonitor,
+  resetPerformanceMonitor,
+  type PerformanceConfig,
+  type PerformanceEntry,
+  type PerformanceMetrics,
+  type NavigationTimingData,
+  type ResourceTimingData,
+  type OperationMetric,
+  type CoreWebVitals,
+} from './performance.js';
+
 // Version
 export const VERSION = '0.1.0';
 
