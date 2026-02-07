@@ -3,7 +3,7 @@ import {
   PerformanceMonitor,
   getPerformanceMonitor,
   resetPerformanceMonitor,
-} from './performance.js';
+} from './performance/index.js';
 
 describe('PerformanceMonitor', () => {
   let monitor: PerformanceMonitor;

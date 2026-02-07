@@ -15,7 +15,7 @@ import {
   CSP_NONCE,
   setNonce,
   getNonce,
-} from './sanitize.js';
+} from './sanitize/index.js';
 
 describe('sanitizeHtml', () => {
   it('should allow safe HTML', () => {

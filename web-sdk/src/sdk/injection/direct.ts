@@ -2,7 +2,7 @@
  * Direct HTML Injection
  */
 
-import { sanitizeHtml } from '../sanitize.js';
+import { sanitizeHtml } from '../sanitize/index.js';
 import type { CachedBanner } from '../cache.js';
 
 export interface DirectInjectionOptions {

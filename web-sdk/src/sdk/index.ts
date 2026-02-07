@@ -78,7 +78,7 @@ export {
   autoRender,
   type RenderOptions,
   type RenderResult,
-} from './render.js';
+} from './render/index.js';
 
 // Fallback exports
 export {
@@ -118,7 +118,7 @@ export {
   type MemorySnapshot,
   type DebugStatistics,
   type DebugBorderOptions,
-} from './debug.js';
+} from './debug/index.js';
 
 // Performance exports
 export {
@@ -132,7 +132,7 @@ export {
   type ResourceTimingData,
   type OperationMetric,
   type CoreWebVitals,
-} from './performance.js';
+} from './performance/index.js';
 
 // Version
 export const VERSION = '0.1.0';

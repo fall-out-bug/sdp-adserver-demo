@@ -3,7 +3,7 @@ import {
   renderBanner,
   detectContainerSize,
   autoRender,
-} from './render.js';
+} from './render/index.js';
 import type { CachedBanner } from './cache.js';
 import { getCachedBanner, setCachedBanner } from './cache.js';
 import { fetchBannerCached } from './client.js';

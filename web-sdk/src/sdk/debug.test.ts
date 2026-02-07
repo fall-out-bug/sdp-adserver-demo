@@ -6,7 +6,7 @@ import {
   LogLevel,
   type DebugConfig,
   type DebugEvent,
-} from './debug.js';
+} from './debug/index.js';
 
 describe('DebugManager', () => {
   let debugManager: DebugManager;

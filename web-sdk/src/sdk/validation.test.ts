@@ -15,7 +15,7 @@ import {
   validateRetryDelay,
   ValidationErrorCode,
   ValidationError,
-} from './validation.js';
+} from './validation/index.js';
 
 describe('validateSlotId', () => {
   it('should accept valid slot IDs', () => {
