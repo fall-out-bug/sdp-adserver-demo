@@ -125,3 +125,9 @@ coverage.xml
 *.egg-info/
 .poetry_metadata/
 poetry.lock
+
+# Node modules
+node_modules/
+.next/
+dist/
+build/
