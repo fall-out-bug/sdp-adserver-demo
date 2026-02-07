@@ -32,8 +32,8 @@ func NewPublisherService(
 type RegisterRequest struct {
 	Email       string `json:"email" binding:"required,email"`
 	Password    string `json:"password" binding:"required,min=8"`
-	CompanyName string `json:"company_name" binding:"required"`
-	Website     string `json:"website" binding:"omitempty,url"`
+	CompanyName string `json:"company_name" form:"company_name" binding:"required"`
+	Website     string `json:"website" form:"website" binding:"omitempty,url"`
 }
 
 // RegisterResponse represents a registration response
