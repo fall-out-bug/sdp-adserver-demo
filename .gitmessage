@@ -1,0 +1,9 @@
+# <type>(<scope>): <subject>
+
+# <body>
+
+# Co-authored-by: Cursor AI <cursor-ai@cursor.sh>
+# 
+# Type: feat, fix, docs, style, refactor, test, chore
+# Scope: optional, e.g. auth, api, docs
+# Subject: imperative mood, lowercase, no period
