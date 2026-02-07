@@ -1,0 +1,50 @@
+/**
+ * AdServer Web SDK
+ * Lightweight JavaScript SDK for ad delivery
+ */
+
+// Core exports
+export { AdServerSDK, getSDK, initSDK } from './core.js';
+
+// Config exports
+export {
+  type SDKConfig,
+  type InternalConfig,
+  mergeConfig,
+  getScriptConfig,
+  getGlobalConfig,
+  initConfig,
+  getConfig,
+  setConfig,
+  validateConfig,
+} from './config.js';
+
+// Events exports
+export { EventEmitter, getEventEmitter, resetEventEmitter } from './events.js';
+
+// Telemetry exports
+export {
+  Logger,
+  ErrorTracker,
+  LogLevel,
+  getLogger,
+  getErrorTracker,
+  resetTelemetry,
+  type LogEntry,
+  type LoggerConfig,
+  type ErrorEntry,
+} from './telemetry.js';
+
+// Version
+export const VERSION = '0.1.0';
+
+// Global singleton
+const sdk = AdServerSDK.getInstance();
+
+// Auto-expose to window for browser usage
+if (typeof window !== 'undefined') {
+  (window as any).AdServerSDK = AdServerSDK;
+  (window as any).adserver = sdk;
+}
+
+export default sdk;
