@@ -1,4 +1,4 @@
-import { afterEach, expect, vi } from 'vitest';
+import { beforeEach, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 
@@ -9,9 +9,15 @@ class ResizeObserverMock {
   disconnect = vi.fn();
 }
 
-global.ResizeObserver = ResizeObserverMock;
-
-expect.extend(matchers);
+// Extend expect with jest-dom matchers in beforeEach to ensure globals are loaded
+beforeEach(() => {
+  global.ResizeObserver = ResizeObserverMock;
+  // @ts-ignore - vitest globals
+  if (typeof expect !== 'undefined') {
+    // @ts-ignore
+    expect.extend(matchers);
+  }
+});
 
 afterEach(() => {
   cleanup();
