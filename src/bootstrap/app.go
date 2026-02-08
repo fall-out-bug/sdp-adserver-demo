@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/fall-out-bug/demo-adserver/src/application/auth"
+	"github.com/fall-out-bug/demo-adserver/src/application/demo"
 	"github.com/fall-out-bug/demo-adserver/src/application/delivery"
 	"github.com/fall-out-bug/demo-adserver/src/application/tracking"
 	"github.com/fall-out-bug/demo-adserver/src/config"
@@ -58,6 +59,8 @@ func New(cfg *config.Config) (*App, error) {
 	clickRepo := postgres.NewClickRepository(db)
 	publisherRepo := postgres.NewPublisherRepository(db)
 	advertiserRepo := postgres.NewAdvertiserRepository(db)
+	demoBannerRepo := postgres.NewDemoBannerRepository(db)
+	demoSlotRepo := postgres.NewDemoSlotRepository(db)
 
 	// Initialize infrastructure
 	rateLimiter := redis.NewRateLimiter(redisClient.Client)
@@ -76,6 +79,7 @@ func New(cfg *config.Config) (*App, error) {
 	clickService := tracking.NewClickService(impressionRepo, clickRepo, bannerRepo)
 	publisherService := auth.NewPublisherService(publisherRepo, passwordHasher, jwtService)
 	advertiserService := auth.NewAdvertiserService(advertiserRepo, passwordHasher, jwtService)
+	demoService := demo.NewService(demoBannerRepo, demoSlotRepo)
 
 	// Create JWT authenticator adapter
 	jwtAuthenticator := securityinfra.NewJWTAuthenticatorAdapter(jwtService)
@@ -98,7 +102,7 @@ func New(cfg *config.Config) (*App, error) {
 
 	// Setup routes with auth services
 	httpHandlers.SetupRoutes(router, deliveryService, impressionService, clickService,
-		publisherService, advertiserService, jwtAuthenticator)
+		publisherService, advertiserService, demoService, jwtAuthenticator)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Server.Port),

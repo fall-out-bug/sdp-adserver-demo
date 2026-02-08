@@ -47,6 +47,11 @@ var (
 	ErrInvalidCompanyName = &DomainError{Message: "invalid company name"}
 	ErrUserNotFound       = &DomainError{Message: "user not found"}
 	ErrInvalidCredentials = &DomainError{Message: "invalid credentials"}
+	ErrInvalidName        = &DomainError{Message: "invalid name"}
+	ErrInvalidFormat      = &DomainError{Message: "invalid format"}
+	ErrInvalidContent     = &DomainError{Message: "invalid content"}
+	ErrInvalidDimensions  = &DomainError{Message: "invalid dimensions"}
+	ErrInvalidSlotID      = &DomainError{Message: "invalid slot id"}
 )
 
 // DomainError represents a domain error

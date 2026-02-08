@@ -3,7 +3,9 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/fall-out-bug/demo-adserver/src/application/auth"
+	"github.com/fall-out-bug/demo-adserver/src/application/demo"
 	httpAuth "github.com/fall-out-bug/demo-adserver/src/presentation/http/auth"
+	demoHandler "github.com/fall-out-bug/demo-adserver/src/presentation/http/demo"
 	"github.com/fall-out-bug/demo-adserver/src/presentation/http/middleware"
 )
 
@@ -15,6 +17,7 @@ func SetupRoutes(
 	clickService ClickService,
 	publisherService *auth.PublisherService,
 	advertiserService *auth.AdvertiserService,
+	demoService *demo.Service,
 	jwtAuthenticator middleware.JWTAuthenticator,
 ) {
 	// Health check
@@ -54,5 +57,27 @@ func SetupRoutes(
 	advertiserGroup.Use(advertiserAuth.RequireAuth())
 	{
 		advertiserGroup.GET("/me", advertiserHandler.GetMe)
+	}
+
+	// Demo API (public endpoints)
+	demoH := demoHandler.NewHandler(demoService)
+	router.GET("/api/v1/demo/slots", demoH.ListSlots)
+	router.GET("/api/v1/demo/slots/:slot_id/banner", demoH.GetSlotBanner)
+
+	// Demo API (admin endpoints - JWT protected)
+	adminAuth := middleware.NewAuthMiddleware(jwtAuthenticator, []string{"admin", "publisher", "advertiser"})
+	demoAdminGroup := router.Group("/api/v1/demo")
+	demoAdminGroup.Use(adminAuth.RequireAuth())
+	{
+		// Banner CRUD
+		demoAdminGroup.POST("/banners", demoH.CreateBanner)
+		demoAdminGroup.GET("/banners", demoH.ListBanners)
+		demoAdminGroup.PUT("/banners/:id", demoH.UpdateBanner)
+		demoAdminGroup.DELETE("/banners/:id", demoH.DeleteBanner)
+
+		// Slot CRUD
+		demoAdminGroup.POST("/slots", demoH.CreateSlot)
+		demoAdminGroup.PUT("/slots/:id", demoH.UpdateSlot)
+		demoAdminGroup.DELETE("/slots/:id", demoH.DeleteSlot)
 	}
 }
