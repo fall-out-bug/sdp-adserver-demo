@@ -89,7 +89,7 @@ func New(cfg *config.Config) (*App, error) {
 	loggingMiddleware := middleware.NewLoggingMiddleware(logger)
 	router.Use(loggingMiddleware.Handle())
 
-	corsMiddleware := middleware.NewCORSMiddleware()
+	corsMiddleware := middleware.NewCORSMiddleware(cfg.CORS.AllowedOrigins...)
 	router.Use(corsMiddleware.Handle())
 
 	// Create middleware adapters

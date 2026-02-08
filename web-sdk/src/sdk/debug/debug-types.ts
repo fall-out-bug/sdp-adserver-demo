@@ -43,3 +43,9 @@ export interface MemorySnapshot {
   usedJSHeapSize: number;
   totalJSHeapSize: number;
 }
+
+export interface DebugBorderOptions {
+  color?: string;
+  width?: string;
+  style?: string;
+}

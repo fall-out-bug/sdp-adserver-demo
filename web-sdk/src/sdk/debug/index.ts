@@ -8,6 +8,7 @@ export type {
   DebugOverlay,
   DebugStatistics,
   DebugBorderOptions,
+  MemorySnapshot,
 } from './debug-types.js';
 
 export type {
@@ -129,8 +130,17 @@ export function getDebugManager(config?: DebugConfig): DebugManager {
   if (!globalDebugManager) {
     globalDebugManager = new DebugManager(config);
   } else if (config) {
-    // Update config if provided
-    Object.assign(globalDebugManager, { _config: { ...globalDebugManager._config, ...config } });
+    // Update config if provided - use public enable/disable API
+    if (config.enabled !== undefined) {
+      if (config.enabled) {
+        globalDebugManager.enable();
+      } else {
+        globalDebugManager.disable();
+      }
+    }
+    if (config.logLevel !== undefined) {
+      globalDebugManager.setLogLevel(config.logLevel);
+    }
   }
   return globalDebugManager;
 }

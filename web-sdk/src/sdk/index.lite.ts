@@ -12,8 +12,8 @@ const sdk = AdServerSDK.getInstance();
 // Auto-initialize with script attributes
 if (typeof window !== 'undefined') {
   initConfig();
-  (window as { AdServerSDK: typeof AdServerSDK; adserver: typeof sdk }).AdServerSDK = AdServerSDK;
-  (window as { adserver: typeof sdk }).adserver = sdk;
+  (window as unknown as { AdServerSDK: typeof AdServerSDK; adserver: typeof sdk }).AdServerSDK = AdServerSDK;
+  (window as unknown as { adserver: typeof sdk }).adserver = sdk;
 }
 
 export { sdk as default };

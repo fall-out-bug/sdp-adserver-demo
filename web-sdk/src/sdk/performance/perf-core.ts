@@ -37,8 +37,8 @@ import { PerformanceOperations } from './perf-operations.js';
  * PerformanceMonitor class for monitoring SDK and page performance
  */
 export class PerformanceMonitor extends PerformanceMonitorBase {
-  private _marks: PerformanceMarks;
-  private _operations: PerformanceOperations;
+  protected _marks: PerformanceMarks;
+  protected _operations: PerformanceOperations;
 
   constructor(config: PerformanceConfig = {}) {
     super(config);

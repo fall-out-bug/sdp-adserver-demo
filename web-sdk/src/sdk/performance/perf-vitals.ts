@@ -15,7 +15,6 @@ export interface CoreWebVitals {
  * Core Web Vitals tracker
  */
 export class CoreWebVitalsTracker {
-  private _enabled: boolean;
   private _vitals: CoreWebVitals = {
     lcp: 0,
     fid: 0,
@@ -27,7 +26,6 @@ export class CoreWebVitalsTracker {
   private _observer: PerformanceObserver | null = null;
 
   constructor(enabled: boolean = true) {
-    this._enabled = enabled;
     if (enabled) {
       this._initCoreWebVitals();
     }
@@ -54,8 +52,9 @@ export class CoreWebVitalsTracker {
               break;
             }
             case 'layout-shift': {
-              const clsEntry = entry as { hadRecentInput: boolean; value: number };
-              if (!clsEntry.hadRecentInput) {
+              // Type assertion for layout shift entry (not standard in PerformanceEntry)
+              const clsEntry = entry as PerformanceEntry & { hadRecentInput?: boolean; value?: number };
+              if (!clsEntry.hadRecentInput && clsEntry.value !== undefined) {
                 this._vitals.cls += clsEntry.value;
                 this._vitals.clsGood = this._vitals.cls <= 0.1;
               }

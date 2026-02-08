@@ -3,9 +3,42 @@
  */
 
 import { PerformanceMonitor as PerfCore } from './perf-core.js';
+import type { PerformanceConfig } from './perf-core-base.js';
+import type { MemorySnapshot } from './perf-memory.js';
 import { MemoryTracker } from './perf-memory.js';
 import { CoreWebVitalsTracker, type CoreWebVitals } from './perf-vitals.js';
 import { MetricsAggregator, type PerformanceMetrics, type NavigationTimingData, type ResourceTimingData } from './perf-metrics.js';
+import type { OperationMetric } from './perf-operations.js';
+
+// Interface for extended methods added via Object.assign in index.ts
+export interface PerformanceMonitor {
+  getMetricsSummary(): {
+    pageLoadTime: string;
+    domReadyTime: string;
+    firstPaint: string;
+    lcp: string;
+    lcpRating: string;
+    fid: string;
+    fidRating: string;
+    cls: string;
+    clsRating: string;
+    memoryUsed: string;
+    resourceCount: number;
+  };
+  export(): {
+    marks: string[];
+    operations: OperationMetric[];
+    memorySnapshots: MemorySnapshot[];
+    metrics: PerformanceMetrics;
+    vitals: CoreWebVitals;
+    thresholds: Record<string, number>;
+  };
+  import(data: { marks?: string[]; operations?: unknown[] }): void;
+  toJSON(): string;
+  formatDuration(ms: number): string;
+  formatBytes(bytes: number): string;
+  getRating(value: number, metric: 'pageLoad' | 'lcp' | 'fid'): string;
+}
 
 /**
  * Extended PerformanceMonitor class with all functionality
@@ -177,10 +210,11 @@ export class PerformanceMonitor extends PerfCore {
   /**
    * Reset all performance data
    */
-  override reset(): void {
+  reset(): void {
     this.clearMarks();
     this.clearMeasures();
-    this._operations.reset();
+    const ops = this as unknown as { _operations: { reset: () => void } };
+    if (ops._operations) ops._operations.reset();
     this._memoryTracker.clearMemorySnapshots();
     this._vitalsTracker.reset();
     this.disconnect();

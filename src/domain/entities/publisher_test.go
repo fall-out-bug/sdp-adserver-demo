@@ -2,7 +2,6 @@ package entities
 
 import (
 	"testing"
-	"time"
 )
 
 func TestNewPublisher(t *testing.T) {

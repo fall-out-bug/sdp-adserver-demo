@@ -142,7 +142,7 @@ export class EventEmitter {
     }
 
     listeners.add(listener);
-    this._eventCount.set(event, count + 1);
+    this._eventCount.set(event, (count ?? 0) + 1);
   }
 
   private _decrementEventCount(event: EventType): void {

@@ -13,6 +13,7 @@ type Config struct {
 	Database DatabaseConfig
 	Redis    RedisConfig
 	JWT      JWTConfig
+	CORS     CORSConfig
 }
 
 // ServerConfig holds HTTP server configuration
@@ -42,8 +43,13 @@ type RedisConfig struct {
 
 // JWTConfig holds JWT configuration
 type JWTConfig struct {
-	Secret     string        `envconfig:"JWT_SECRET" default:"secret-key-change-in-production"`
+	Secret     string        `envconfig:"JWT_SECRET" required:"true"` // No default - must be set
 	Expiration time.Duration `envconfig:"JWT_EXPIRATION" default:"24h"`
+}
+
+// CORSConfig holds CORS configuration
+type CORSConfig struct {
+	AllowedOrigins []string `envconfig:"CORS_ALLOWED_ORIGINS" default:"http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001"`
 }
 
 // Load loads configuration from environment variables
@@ -66,7 +72,37 @@ func Load() (*Config, error) {
 		cfg.JWT.Expiration = 24 * time.Hour
 	}
 
+	// Validate JWT secret is not obviously insecure
+	if err := validateJWTSecret(cfg.JWT.Secret); err != nil {
+		return nil, fmt.Errorf("JWT secret validation failed: %w", err)
+	}
+
 	return cfg, nil
+}
+
+// validateJWTSecret ensures the JWT secret is not obviously insecure
+func validateJWTSecret(secret string) error {
+	if len(secret) < 32 {
+		return fmt.Errorf("JWT secret must be at least 32 characters long, got %d", len(secret))
+	}
+
+	// Check for known insecure secrets
+	insecureSecrets := []string{
+		"secret",
+		"secret-key-change-in-production",
+		"jwt-secret",
+		"password",
+		"12345678",
+		"abcdefgh",
+	}
+
+	for _, insecure := range insecureSecrets {
+		if secret == insecure {
+			return fmt.Errorf("JWT secret is insecure (matches known pattern)")
+		}
+	}
+
+	return nil
 }
 
 // DSN returns the PostgreSQL connection string

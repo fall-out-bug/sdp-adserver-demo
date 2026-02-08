@@ -86,7 +86,7 @@ func TestCORSMiddleware_Options(t *testing.T) {
 func TestCORSMiddleware_CORSHeaders(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	middleware := httpmiddleware.NewCORSMiddleware()
+	middleware := httpmiddleware.NewCORSMiddleware("http://localhost:3000")
 
 	router := gin.New()
 	router.Use(middleware.Handle())
@@ -95,10 +95,38 @@ func TestCORSMiddleware_CORSHeaders(t *testing.T) {
 	})
 
 	req, _ := http.NewRequest("GET", "/test", nil)
+	req.Header.Set("Origin", "http://localhost:3000")
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	if w.Header().Get("Access-Control-Allow-Origin") != "*" {
-		t.Errorf("Expected CORS header")
+	origin := w.Header().Get("Access-Control-Allow-Origin")
+	if origin != "http://localhost:3000" {
+		t.Errorf("Expected origin 'http://localhost:3000', got '%s'", origin)
+	}
+
+	if w.Header().Get("Access-Control-Allow-Credentials") == "" {
+		t.Errorf("Expected credentials header")
+	}
+}
+
+func TestCORSMiddleware_UnallowedOrigin(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	middleware := httpmiddleware.NewCORSMiddleware("http://localhost:3000")
+
+	router := gin.New()
+	router.Use(middleware.Handle())
+	router.GET("/test", func(c *gin.Context) {
+		c.Status(200)
+	})
+
+	req, _ := http.NewRequest("GET", "/test", nil)
+	req.Header.Set("Origin", "http://evil.com")
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	origin := w.Header().Get("Access-Control-Allow-Origin")
+	if origin != "" {
+		t.Errorf("Expected no CORS header for unallowed origin, got '%s'", origin)
 	}
 }

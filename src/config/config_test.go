@@ -3,13 +3,14 @@ package config
 import (
 	"os"
 	"testing"
-	"time"
 )
 
 func TestConfig_Load_Defaults(t *testing.T) {
 	// Set minimal required env vars
-	os.Setenv("ADSERVER_DB_PASSWORD", "testpass")
-	defer os.Unsetenv("ADSERVER_DB_PASSWORD")
+	os.Setenv("DB_PASSWORD", "testpass")
+	os.Setenv("JWT_SECRET", "this-is-a-test-jwt-secret-at-least-32-characters-long")
+	defer os.Unsetenv("DB_PASSWORD")
+	defer os.Unsetenv("JWT_SECRET")
 
 	cfg, err := Load()
 	if err != nil {
@@ -27,14 +28,16 @@ func TestConfig_Load_Defaults(t *testing.T) {
 }
 
 func TestConfig_Load_FromEnv(t *testing.T) {
-	os.Setenv("ADSERVER_SERVER_PORT", "9000")
-	os.Setenv("ADSERVER_DB_PASSWORD", "secret")
-	os.Setenv("ADSERVER_DB_HOST", "db.example.com")
-	os.Setenv("ADSERVER_REDIS_ADDR", "redis:6379")
-	defer os.Unsetenv("ADSERVER_SERVER_PORT")
-	defer os.Unsetenv("ADSERVER_DB_PASSWORD")
-	defer os.Unsetenv("ADSERVER_DB_HOST")
-	defer os.Unsetenv("ADSERVER_REDIS_ADDR")
+	os.Setenv("SERVER_PORT", "9000")
+	os.Setenv("DB_PASSWORD", "secret")
+	os.Setenv("DB_HOST", "db.example.com")
+	os.Setenv("REDIS_ADDR", "redis:6379")
+	os.Setenv("JWT_SECRET", "this-is-a-test-jwt-secret-at-least-32-characters-long")
+	defer os.Unsetenv("SERVER_PORT")
+	defer os.Unsetenv("DB_PASSWORD")
+	defer os.Unsetenv("DB_HOST")
+	defer os.Unsetenv("REDIS_ADDR")
+	defer os.Unsetenv("JWT_SECRET")
 
 	cfg, err := Load()
 	if err != nil {
@@ -55,12 +58,37 @@ func TestConfig_Load_FromEnv(t *testing.T) {
 }
 
 func TestConfig_Load_MissingRequired(t *testing.T) {
-	// Clear required env var
-	os.Unsetenv("ADSERVER_DB_PASSWORD")
+	// Clear required env vars
+	os.Unsetenv("DB_PASSWORD")
+	os.Unsetenv("JWT_SECRET")
 
 	_, err := Load()
 	if err == nil {
 		t.Errorf("Expected error for missing required field")
+	}
+}
+
+func TestConfig_Load_InvalidJWTSecret(t *testing.T) {
+	os.Setenv("DB_PASSWORD", "testpass")
+	os.Setenv("JWT_SECRET", "short")
+	defer os.Unsetenv("DB_PASSWORD")
+	defer os.Unsetenv("JWT_SECRET")
+
+	_, err := Load()
+	if err == nil {
+		t.Errorf("Expected error for short JWT secret")
+	}
+}
+
+func TestConfig_Load_InsecureJWTSecret(t *testing.T) {
+	os.Setenv("DB_PASSWORD", "testpass")
+	os.Setenv("JWT_SECRET", "secret-key-change-in-production")
+	defer os.Unsetenv("DB_PASSWORD")
+	defer os.Unsetenv("JWT_SECRET")
+
+	_, err := Load()
+	if err == nil {
+		t.Errorf("Expected error for insecure JWT secret")
 	}
 }
 

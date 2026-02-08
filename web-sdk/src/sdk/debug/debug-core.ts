@@ -7,6 +7,7 @@ export type {
   DebugEvent,
   DebugOverlay,
   DebugStatistics,
+  MemorySnapshot,
 } from './debug-types.js';
 
 export {
@@ -33,7 +34,7 @@ export {
   DebugMemory,
 } from './debug-memory.js';
 
-import type { DebugConfig, DebugEvent, DebugOverlay, DebugStatistics } from './debug-types.js';
+import type { DebugConfig, DebugEvent, DebugOverlay, DebugStatistics, MemorySnapshot } from './debug-types.js';
 import { LogLevel, DebugLogger } from './debug-logging.js';
 import { DebugEventTracker } from './debug-events.js';
 import { DebugCounter } from './debug-counters.js';
@@ -228,7 +229,7 @@ export class DebugManager {
   /**
    * Get all memory snapshots
    */
-  getMemorySnapshots(): unknown[] {
+  getMemorySnapshots(): MemorySnapshot[] {
     return this._memory.getMemorySnapshots();
   }
 

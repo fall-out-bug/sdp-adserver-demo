@@ -60,7 +60,7 @@ import { MetricsAggregator } from './perf-metrics.js';
 
 // Extend PerformanceMonitor with export functionality
 Object.assign(PerfMonitor.prototype, {
-  getMetricsSummary: function(this: unknown) {
+  getMetricsSummary: function(this: InstanceType<typeof PerfMonitor>) {
     const metrics = this.getMetrics();
     const vitals = this.getCoreWebVitals();
 
@@ -85,35 +85,35 @@ Object.assign(PerfMonitor.prototype, {
       resourceCount: metrics.resourceCount,
     };
   },
-  export: function(this: unknown) {
+  export: function(this: InstanceType<typeof PerfMonitor>) {
     return {
       marks: this.getCustomMarks(),
       operations: this.getOperationMetrics(),
       memorySnapshots: this.getMemorySnapshots(),
       metrics: this.getMetrics(),
       vitals: this.getCoreWebVitals(),
-      thresholds: Object.fromEntries(this._operations.getThresholds ? this._operations.getThresholds() : []),
+      thresholds: Object.fromEntries((this as unknown as { _operations: { getThresholds?: () => Map<string, number>} })._operations.getThresholds?.() ?? []),
     };
   },
-  import: function(this: unknown, data: { marks?: string[]; operations?: unknown[] }) {
+  import: function(this: InstanceType<typeof PerfMonitor>, data: { marks?: string[]; operations?: unknown[] }) {
     if (data.marks) {
-      this._marks.importMarks(data.marks);
+      (this as unknown as { _marks: { importMarks: (marks: string[]) => void } })._marks.importMarks(data.marks);
     }
 
     if (data.operations) {
-      this._operations.importOperations(data.operations);
+      (this as unknown as { _operations: { importOperations: (ops: unknown[]) => void } })._operations.importOperations(data.operations);
     }
   },
-  toJSON: function(this: unknown) {
+  toJSON: function(this: InstanceType<typeof PerfMonitor>) {
     return JSON.stringify(this.export());
   },
-  formatDuration: function(this: unknown, ms: number) {
+  formatDuration: function(this: InstanceType<typeof PerfMonitor>, ms: number) {
     return MetricsAggregator.formatDuration(ms);
   },
-  formatBytes: function(this: unknown, bytes: number) {
+  formatBytes: function(this: InstanceType<typeof PerfMonitor>, bytes: number) {
     return MetricsAggregator.formatBytes(bytes);
   },
-  getRating: function(this: unknown, value: number, metric: 'pageLoad' | 'lcp' | 'fid') {
+  getRating: function(this: InstanceType<typeof PerfMonitor>, value: number, metric: 'pageLoad' | 'lcp' | 'fid') {
     return MetricsAggregator.getRating(value, metric);
   },
 });

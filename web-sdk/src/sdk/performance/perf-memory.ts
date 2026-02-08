@@ -63,9 +63,8 @@ export class MemoryTracker {
 
     this._memorySnapshots.push(snapshot);
 
-    // Limit snapshots
-    const monitorConfig = this._monitor as { _config?: { maxMemorySnapshots?: number } };
-    const maxSnapshots = monitorConfig._config?.maxMemorySnapshots ?? 50;
+    // Limit snapshots - use default since we can't access private config
+    const maxSnapshots = 50;
     if (this._memorySnapshots.length > maxSnapshots) {
       this._memorySnapshots.shift();
     }

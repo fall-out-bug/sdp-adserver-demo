@@ -67,14 +67,17 @@ export class MetricsAggregator {
 
     try {
       const resources = performance.getEntriesByType?.('resource') ?? [];
-      return resources.map((r: PerformanceResourceTiming) => ({
-        name: r.name,
-        url: r.name,
-        duration: r.duration,
-        transferSize: r.transferSize ?? 0,
-        encodedBodySize: r.encodedBodySize ?? 0,
-        decodedBodySize: r.decodedBodySize ?? 0,
-      }));
+      return resources.map((r) => {
+        const resource = r as PerformanceResourceTiming;
+        return {
+          name: resource.name,
+          url: resource.name,
+          duration: resource.duration,
+          transferSize: resource.transferSize ?? 0,
+          encodedBodySize: resource.encodedBodySize ?? 0,
+          decodedBodySize: resource.decodedBodySize ?? 0,
+        };
+      });
     } catch {
       return [];
     }
