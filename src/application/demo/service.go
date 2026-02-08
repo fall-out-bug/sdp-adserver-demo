@@ -27,7 +27,19 @@ func NewService(bannerRepo repositories.DemoBannerRepository, slotRepo repositor
 
 // CreateBanner creates a new demo banner
 func (s *Service) CreateBanner(ctx context.Context, name, format string, width, height int, html, imageURL, clickURL string) (*entities.DemoBanner, error) {
-	banner, err := entities.NewDemoBanner(name, format, width, height, html, imageURL, clickURL)
+	// Convert empty strings to nil pointers for nullable fields
+	var htmlPtr, imageURLPtr, clickURLPtr *string
+	if html != "" {
+		htmlPtr = &html
+	}
+	if imageURL != "" {
+		imageURLPtr = &imageURL
+	}
+	if clickURL != "" {
+		clickURLPtr = &clickURL
+	}
+
+	banner, err := entities.NewDemoBanner(name, format, width, height, htmlPtr, imageURLPtr, clickURLPtr)
 	if err != nil {
 		return nil, fmt.Errorf("invalid banner: %w", err)
 	}
@@ -66,14 +78,26 @@ func (s *Service) UpdateBanner(ctx context.Context, id uuid.UUID, name, format s
 		return nil, fmt.Errorf("banner not found: %w", err)
 	}
 
+	// Convert empty strings to nil pointers for nullable fields
+	var htmlPtr, imageURLPtr, clickURLPtr *string
+	if html != "" {
+		htmlPtr = &html
+	}
+	if imageURL != "" {
+		imageURLPtr = &imageURL
+	}
+	if clickURL != "" {
+		clickURLPtr = &clickURL
+	}
+
 	// Update fields
 	banner.Name = name
 	banner.Format = format
-	banner.HTML = html
-	banner.ImageURL = imageURL
+	banner.HTML = htmlPtr
+	banner.ImageURL = imageURLPtr
 	banner.Width = width
 	banner.Height = height
-	banner.ClickURL = clickURL
+	banner.ClickURL = clickURLPtr
 	banner.Active = active
 
 	// Validate updated banner
@@ -201,13 +225,22 @@ func (s *Service) GetBannerForSlot(ctx context.Context, slotID string) (*entitie
 		return nil, fmt.Errorf("slot not found: %w", err)
 	}
 
-	if slot.DemoBanner == nil {
+	if slot.DemoBannerID == nil {
 		return nil, fmt.Errorf("no banner assigned to slot")
 	}
 
-	if !slot.DemoBanner.Active {
+	banner, err := s.bannerRepo.GetByID(ctx, *slot.DemoBannerID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load banner: %w", err)
+	}
+
+	if banner == nil {
+		return nil, fmt.Errorf("banner not found")
+	}
+
+	if !banner.Active {
 		return nil, fmt.Errorf("banner is not active")
 	}
 
-	return slot.DemoBanner, nil
+	return banner, nil
 }

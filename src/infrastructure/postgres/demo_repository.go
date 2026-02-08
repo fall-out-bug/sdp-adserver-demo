@@ -316,11 +316,6 @@ func (r *demoSlotRepository) GetBySlotID(ctx context.Context, slotID string) (*e
 		bannerID, err := uuid.Parse(*bannerIDStr)
 		if err == nil {
 			slot.DemoBannerID = &bannerID
-			// Load banner
-			banner, err := r.getBannerByUUID(ctx, bannerID)
-			if err == nil {
-				slot.DemoBanner = banner
-			}
 		}
 	}
 

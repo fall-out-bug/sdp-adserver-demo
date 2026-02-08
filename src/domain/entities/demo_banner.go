@@ -8,16 +8,16 @@ import (
 
 // DemoBanner represents a demo banner for the demo website
 type DemoBanner struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	Name      string    `json:"name" db:"name"`
-	Format    string    `json:"format" db:"format"` // leaderboard, medium-rectangle, skyscraper, etc
-	HTML      string    `json:"html,omitempty" db:"html"`
-	ImageURL  string    `json:"image_url,omitempty" db:"image_url"`
-	Width     int       `json:"width" db:"width"`
-	Height    int       `json:"height" db:"height"`
-	ClickURL  string    `json:"click_url,omitempty" db:"click_url"`
-	Active    bool      `json:"active" db:"active"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	ID        uuid.UUID  `json:"id" db:"id"`
+	Name      string     `json:"name" db:"name"`
+	Format    string     `json:"format" db:"format"` // leaderboard, medium-rectangle, skyscraper, etc
+	HTML      *string    `json:"html,omitempty" db:"html"`
+	ImageURL  *string    `json:"image_url,omitempty" db:"image_url"`
+	Width     int        `json:"width" db:"width"`
+	Height    int        `json:"height" db:"height"`
+	ClickURL  *string    `json:"click_url,omitempty" db:"click_url"`
+	Active    bool       `json:"active" db:"active"`
+	CreatedAt time.Time  `json:"created_at" db:"created_at"`
 }
 
 // ValidBannerFormats defines supported banner formats
@@ -37,7 +37,9 @@ func (b *DemoBanner) IsValidFormat() bool {
 
 // HasContent checks if banner has either HTML or image
 func (b *DemoBanner) HasContent() bool {
-	return b.HTML != "" || b.ImageURL != ""
+	htmlNotEmpty := b.HTML != nil && *b.HTML != ""
+	imageNotEmpty := b.ImageURL != nil && *b.ImageURL != ""
+	return htmlNotEmpty || imageNotEmpty
 }
 
 // Validate checks if the banner entity is valid
@@ -58,7 +60,7 @@ func (b *DemoBanner) Validate() error {
 }
 
 // NewDemoBanner creates a new demo banner with validation
-func NewDemoBanner(name, format string, width, height int, html, imageURL, clickURL string) (*DemoBanner, error) {
+func NewDemoBanner(name, format string, width, height int, html, imageURL, clickURL *string) (*DemoBanner, error) {
 	banner := &DemoBanner{
 		ID:        uuid.New(),
 		Name:      name,

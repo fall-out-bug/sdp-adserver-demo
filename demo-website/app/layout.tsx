@@ -1,21 +1,18 @@
-import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'AdServer Demo - Monetize Your Traffic',
-  description: 'Demo website showcasing AdServer SDK capabilities',
-};
+  title: 'AdServer Demo',
+  description: 'Demo Ad Server Platform',
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className="antialiased">
-        {children}
-      </body>
+    <html lang="ru">
+      <body>{children}</body>
     </html>
-  );
+  )
 }
