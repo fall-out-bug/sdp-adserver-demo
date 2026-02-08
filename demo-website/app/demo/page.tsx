@@ -1,38 +1,74 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { initSDK } from '@/lib/sdk';
 
 export default function DemoPage() {
   const [loadedBanners, setLoadedBanners] = useState<Set<string>>(new Set());
+  const leaderboardRef = useRef<HTMLDivElement>(null);
+  const mediumRectRef = useRef<HTMLDivElement>(null);
+  const skyscraperRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Load banners only once when component mounts
+    // Mark component as mounted
+    setIsMounted(true);
+
+    // Load banners only once when component mounts and DOM is ready
     const loadBanners = async () => {
-      // Wait for DOM to be ready
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Wait for React to complete rendering using requestAnimationFrame
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          setTimeout(resolve, 50); // Small additional delay
+        });
+      });
+
+      // Collect all refs at the start to avoid re-render issues
+      const slotRefs = [
+        { id: 'demo-leaderboard', ref: leaderboardRef, name: 'Leaderboard' },
+        { id: 'demo-medium-rect', ref: mediumRectRef, name: 'Medium Rectangle' },
+        { id: 'demo-skyscraper', ref: skyscraperRef, name: 'Skyscraper' },
+      ];
+
+      // Wait for all refs to be ready
+      for (const slot of slotRefs) {
+        let attempts = 0;
+        while (!slot.ref.current && attempts < 20) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+          attempts++;
+        }
+      }
 
       // Initialize SDK
       const sdk = initSDK({ debug: true });
       console.log('[DemoPage] SDK initialized, loading banners...');
 
-      // Load banners sequentially
-      const slotIds = ['demo-leaderboard', 'demo-medium-rect', 'demo-skyscraper'];
+      // Collect loaded slot IDs
+      const loadedSlots: string[] = [];
 
-      for (const slotId of slotIds) {
-        try {
-          await sdk.loadBanner(slotId, `container-${slotId}`);
-          console.log(`[DemoPage] Banner loaded for ${slotId}`);
-          setLoadedBanners((prev) => new Set(prev).add(slotId));
-        } catch (err) {
-          console.error(`[DemoPage] Failed to load ${slotId}:`, err);
+      // Load banners sequentially
+      for (const slot of slotRefs) {
+        if (!slot.ref.current) {
+          console.error(`[DemoPage] Container ref for ${slot.name} not ready after retries`);
+          continue;
         }
+
+        try {
+          await sdk.loadBanner(slot.id, slot.ref.current);
+          console.log(`[DemoPage] Banner loaded for ${slot.name}`);
+          loadedSlots.push(slot.id);
+        } catch (err) {
+          console.error(`[DemoPage] Failed to load ${slot.name}:`, err);
+        }
+      }
+
+      // Update state once with all loaded slots
+      if (loadedSlots.length > 0) {
+        setLoadedBanners(new Set(loadedSlots));
       }
     };
 
     loadBanners();
-
-    // No cleanup needed since we only load once
   }, []); // Empty deps array = only run once
 
   return (
@@ -59,6 +95,7 @@ export default function DemoPage() {
           <h3>Leaderboard (728×90)</h3>
           <div className="banner-container">
             <div
+              ref={leaderboardRef}
               id="container-demo-leaderboard"
               className="banner-slot"
               style={{ width: '728px', height: '90px', position: 'relative' }}
@@ -77,6 +114,7 @@ export default function DemoPage() {
           <h3>Medium Rectangle (300×250)</h3>
           <div className="banner-container">
             <div
+              ref={mediumRectRef}
               id="container-demo-medium-rect"
               className="banner-slot"
               style={{ width: '300px', height: '250px', position: 'relative' }}
@@ -95,6 +133,7 @@ export default function DemoPage() {
           <h3>Skyscraper (160×600)</h3>
           <div className="banner-container">
             <div
+              ref={skyscraperRef}
               id="container-demo-skyscraper"
               className="banner-slot"
               style={{ width: '160px', height: '600px', position: 'relative' }}
