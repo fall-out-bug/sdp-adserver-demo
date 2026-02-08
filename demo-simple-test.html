@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo AdServer - Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; padding: 20px; }
+        .banner-container { background: #f9fafb; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .banner-slot { border: 1px solid #e5e7eb; background: #fff; }
+        .loading { color: #9ca3af; padding: 20px; text-align: center; }
+        h1 { margin-bottom: 20px; }
+        h2 { margin-bottom: 10px; }
+        .status { padding: 10px; margin: 10px 0; background: #e5e7eb; border-radius: 4px; }
+        .status.success { background: #d1fae5; }
+        .status.error { background: #fee2e2; }
+    </style>
+</head>
+<body>
+    <h1>🚀 AdServer Demo Test</h1>
+
+    <div id="status" class="status">Initializing SDK...</div>
+
+    <h2>Leaderboard (728×90)</h2>
+    <div class="banner-container">
+        <div id="container-demo-leaderboard" class="banner-slot" style="width: 728px; height: 90px;">
+            <div class="loading">Loading...</div>
+        </div>
+    </div>
+
+    <h2>Medium Rectangle (300×250)</h2>
+    <div class="banner-container">
+        <div id="container-demo-medium-rect" class="banner-slot" style="width: 300px; height: 250px;">
+            <div class="loading">Loading...</div>
+        </div>
+    </div>
+
+    <h2>Skyscraper (160×600)</h2>
+    <div class="banner-container">
+        <div id="container-demo-skyscraper" class="banner-slot" style="width: 160px; height: 600px;">
+            <div class="loading">Loading...</div>
+        </div>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/v1';
+        const status = document.getElementById('status');
+        const results = document.getElementById('results');
+
+        async function loadBanners() {
+            status.textContent = 'Loading banners...';
+            const slotIds = ['demo-leaderboard', 'demo-medium-rect', 'demo-skyscraper'];
+            const results = [];
+
+            for (const slotId of slotIds) {
+                try {
+                    console.log(`Loading ${slotId}...`);
+                    const response = await fetch(`${API_BASE}/delivery/${slotId}`);
+                    const data = await response.json();
+
+                    if (data.creative && data.creative.html) {
+                        const container = document.getElementById(`container-${slotId}`);
+                        if (container) {
+                            container.innerHTML = data.creative.html;
+                            results.push(`✅ ${slotId}: ${data.creative.width}x${data.creative.height}`);
+                            console.log(`✅ ${slotId} loaded`);
+                        } else {
+                            results.push(`❌ ${slotId}: Container not found`);
+                            console.error(`❌ Container not found for ${slotId}`);
+                        }
+                    } else {
+                        results.push(`❌ ${slotId}: No creative`);
+                        console.error(`❌ No creative for ${slotId}`);
+                    }
+                } catch (error) {
+                    results.push(`❌ ${slotId}: ${error.message}`);
+                    console.error(`❌ Error loading ${slotId}:`, error);
+                }
+            }
+
+            status.textContent = `Complete! (${results.filter(r => r.startsWith('✅')).length}/${results.length} loaded)`;
+            status.className = results.every(r => r.startsWith('✅')) ? 'status success' : 'status error';
+
+            results.innerHTML = results.map(r => `<div>${r}</div>`).join('');
+            document.getElementById('results').innerHTML = '<h3>Results:</h3>' + results.join('');
+        }
+
+        // Wait for DOM to be ready
+        setTimeout(loadBanners, 1000);
+    </script>
+</body>
+</html>

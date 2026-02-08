@@ -383,9 +383,10 @@ func TestService_DeliverBanner_RepositoryError_ReturnsFallback(t *testing.T) {
 
 	campaignRepo := &mockCampaignRepo{}
 	bannerRepo := &mockBannerRepo{}
+	var demoSlotRepo *mockDemoSlotRepo
 	cache := &mockCache{}
 
-	service := NewService(campaignRepo, bannerRepo, cache)
+	service := NewService(campaignRepo, bannerRepo, demoSlotRepo, cache)
 
 	// Mock a repository error by passing nil context
 	_, err := service.DeliverBanner(nil, "slot-1", &DeliveryRequest{

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AdServer Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .banner-slot { border: 2px solid #333; margin: 20px 0; }
+        #leaderboard { width: 728px; height: 90px; }
+        #medium-rect { width: 300px; height: 250px; }
+        pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>AdServer Delivery Test</h1>
+
+    <h2>Direct API Test</h2>
+    <button onclick="testAPI()">Test API</button>
+    <pre id="api-result">Click to test...</pre>
+
+    <h2>Leaderboard Banner (728x90)</h2>
+    <div id="leaderboard" class="banner-slot">
+        <div style="padding: 20px; text-align: center;">Loading...</div>
+    </div>
+
+    <h2>Medium Rectangle (300x250)</h2>
+    <div id="medium-rect" class="banner-slot">
+        <div style="padding: 20px; text-align: center;">Loading...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/v1';
+
+        async function testAPI() {
+            const result = document.getElementById('api-result');
+            result.textContent = 'Loading...';
+
+            try {
+                // Test 1: Health check
+                const health = await fetch(API_BASE.replace('/api/v1', '') + '/health');
+                result.textContent = 'Health: ' + health.status + '\n';
+
+                // Test 2: Slots
+                const slots = await fetch(API_BASE + '/demo/slots');
+                const slotsData = await slots.json();
+                result.textContent += 'Slots: ' + slotsData.slots?.length + ' found\n';
+
+                // Test 3: Slot banner
+                const banner = await fetch(API_BASE + '/demo/slots/demo-leaderboard/banner');
+                const bannerData = await banner.json();
+                result.textContent += 'Banner: ' + bannerData.name + ' (' + bannerData.width + 'x' + bannerData.height + ')\n';
+
+                // Test 4: Delivery
+                const delivery = await fetch(API_BASE + '/delivery/demo-leaderboard');
+                const deliveryData = await delivery.json();
+                result.textContent += '\nDelivery Response:\n' + JSON.stringify(deliveryData, null, 2);
+
+                // Try to render banner
+                if (deliveryData.creative && deliveryData.creative.html) {
+                    document.getElementById('leaderboard').innerHTML = deliveryData.creative.html;
+                    document.getElementById('medium-rect').innerHTML = deliveryData.creative.html;
+                } else if (deliveryData.fallback) {
+                    document.getElementById('leaderboard').innerHTML = deliveryData.fallback.html;
+                    document.getElementById('medium-rect').innerHTML = deliveryData.fallback.html;
+                }
+
+            } catch (error) {
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        // Auto-test on load
+        window.onload = () => {
+            setTimeout(testAPI, 500);
+        };
+    </script>
+</body>
+</html>

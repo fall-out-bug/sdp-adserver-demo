@@ -74,7 +74,7 @@ func New(cfg *config.Config) (*App, error) {
 	jwtService := securityinfra.NewJWTService(cfg.JWT.Secret, cfg.JWT.Expiration)
 
 	// Initialize services
-	deliveryService := delivery.NewService(campaignRepo, bannerRepo, cacheAdapter)
+	deliveryService := delivery.NewService(campaignRepo, bannerRepo, demoBannerRepo, demoSlotRepo, cacheAdapter)
 	impressionService := tracking.NewImpressionService(impressionRepo, deduper)
 	clickService := tracking.NewClickService(impressionRepo, clickRepo, bannerRepo)
 	publisherService := auth.NewPublisherService(publisherRepo, passwordHasher, jwtService)

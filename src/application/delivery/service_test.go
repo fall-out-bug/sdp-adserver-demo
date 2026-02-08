@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fall-out-bug/demo-adserver/src/domain/entities"
+	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
 
@@ -107,11 +108,42 @@ func (m *mockCache) InvalidateBanner(ctx context.Context, slotID string) error {
 	return nil
 }
 
+type mockDemoSlotRepo struct{}
+
+func (m *mockDemoSlotRepo) GetBySlotID(ctx context.Context, slotID string) (*entities.DemoSlot, error) {
+	return nil, nil
+}
+
+func (m *mockDemoSlotRepo) Create(ctx context.Context, slot *entities.DemoSlot) error {
+	return nil
+}
+
+func (m *mockDemoSlotRepo) GetByID(ctx context.Context, id uuid.UUID) (*entities.DemoSlot, error) {
+	return nil, nil
+}
+
+func (m *mockDemoSlotRepo) GetAll(ctx context.Context) ([]*entities.DemoSlot, error) {
+	return nil, nil
+}
+
+func (m *mockDemoSlotRepo) Update(ctx context.Context, slot *entities.DemoSlot) error {
+	return nil
+}
+
+func (m *mockDemoSlotRepo) Delete(ctx context.Context, id uuid.UUID) error {
+	return nil
+}
+
+func (m *mockDemoSlotRepo) GetAllActive(ctx context.Context) ([]*entities.DemoSlot, error) {
+	return nil, nil
+}
+
 func TestService_DeliverBanner_CacheHit_ReturnsCached(t *testing.T) {
 	// Arrange
 	ctx := context.Background()
 	campaignRepo := &mockCampaignRepo{}
 	bannerRepo := &mockBannerRepo{}
+	var demoSlotRepo *mockDemoSlotRepo
 	cache := &mockCache{
 		banners: map[string]*CachedBanner{
 			"slot-1": {
@@ -123,7 +155,7 @@ func TestService_DeliverBanner_CacheHit_ReturnsCached(t *testing.T) {
 		},
 	}
 
-	service := NewService(campaignRepo, bannerRepo, cache)
+	service := NewService(campaignRepo, bannerRepo, demoSlotRepo, cache)
 
 	// Act
 	response, err := service.DeliverBanner(ctx, "slot-1", &DeliveryRequest{
@@ -148,9 +180,10 @@ func TestService_DeliverBanner_NoCampaigns_ReturnsFallback(t *testing.T) {
 	ctx := context.Background()
 	campaignRepo := &mockCampaignRepo{campaigns: []*entities.Campaign{}}
 	bannerRepo := &mockBannerRepo{}
+	var demoSlotRepo *mockDemoSlotRepo
 	cache := &mockCache{}
 
-	service := NewService(campaignRepo, bannerRepo, cache)
+	service := NewService(campaignRepo, bannerRepo, demoSlotRepo, cache)
 
 	// Act
 	response, err := service.DeliverBanner(ctx, "slot-1", &DeliveryRequest{
@@ -201,9 +234,10 @@ func TestService_DeliverBanner_ActiveCampaign_ReturnsBanner(t *testing.T) {
 
 	campaignRepo := &mockCampaignRepo{campaigns: []*entities.Campaign{campaign}}
 	bannerRepo := &mockBannerRepo{banners: []*entities.Banner{banner}}
+	var demoSlotRepo *mockDemoSlotRepo
 	cache := &mockCache{}
 
-	service := NewService(campaignRepo, bannerRepo, cache)
+	service := NewService(campaignRepo, bannerRepo, demoSlotRepo, cache)
 
 	// Act
 	response, err := service.DeliverBanner(ctx, "slot-1", &DeliveryRequest{
@@ -247,9 +281,10 @@ func TestService_DeliverBanner_TargetingMismatch_ReturnsFallback(t *testing.T) {
 
 	campaignRepo := &mockCampaignRepo{campaigns: []*entities.Campaign{campaign}}
 	bannerRepo := &mockBannerRepo{}
+	var demoSlotRepo *mockDemoSlotRepo
 	cache := &mockCache{}
 
-	service := NewService(campaignRepo, bannerRepo, cache)
+	service := NewService(campaignRepo, bannerRepo, demoSlotRepo, cache)
 
 	// Act - Request from CA (not US)
 	response, err := service.DeliverBanner(ctx, "slot-1", &DeliveryRequest{

@@ -12,7 +12,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [formData, setFormData] = useState({
-    name: '',
+    companyName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -38,7 +38,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const response = await authApi.register({
-        name: formData.name,
+        company_name: formData.companyName,
         email: formData.email,
         password: formData.password,
       });
@@ -68,10 +68,10 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label="Имя"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              error={errors.name}
+              label="Название компании"
+              value={formData.companyName}
+              onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+              error={errors.companyName}
               required
             />
 
