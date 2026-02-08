@@ -21,6 +21,7 @@ func NewCORSMiddleware(allowedOrigins ...string) *CORSMiddleware {
 			"http://localhost:3001",
 			"http://127.0.0.1:3000",
 			"http://127.0.0.1:3001",
+			"null", // Allow file:// URLs for testing
 		}
 	}
 	return &CORSMiddleware{
@@ -37,6 +38,13 @@ func (m *CORSMiddleware) Handle() gin.HandlerFunc {
 		allowed := false
 		if origin != "" {
 			for _, allowedOrigin := range m.allowedOrigins {
+				// Special handling for null origin (file:// URLs)
+				if origin == "null" && allowedOrigin == "null" {
+					allowed = true
+					c.Header("Access-Control-Allow-Origin", "*")
+					break
+				}
+				// Wildcard or matching origin
 				if allowedOrigin == "*" || m.matchOrigin(origin, allowedOrigin) {
 					allowed = true
 					c.Header("Access-Control-Allow-Origin", origin)
