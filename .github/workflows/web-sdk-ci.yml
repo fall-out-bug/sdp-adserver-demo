@@ -55,7 +55,7 @@ jobs:
           npm run size:check
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ./web-sdk/coverage/coverage-final.json
           flags: web-sdk
